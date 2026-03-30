@@ -46,20 +46,19 @@ export function EmploymentHistoryForm() {
 
   const form = useReactHookForm<EmploymentHistoryFormData>({
     resolver: zodResolver(employmentHistorySchema),
+    mode: 'onChange',
     defaultValues: {
-      currentEmployer: formData.currentEmployer,
-      currentPosition: formData.currentPosition,
-      currentStartDate: formData.currentStartDate,
-      currentEndDate: formData.currentEndDate,
-      currentSalary: formData.currentSalary,
-      currentReasonForLeaving: formData.currentReasonForLeaving,
-      previousEmployment: formData.previousEmployment.length > 0 ? formData.previousEmployment : [
-        { employer: '', position: '', startDate: '', endDate: '', salary: '', reasonForLeaving: '' }
-      ],
-      militaryService: formData.militaryService,
-      militaryBranch: formData.militaryBranch,
-      militaryRank: formData.militaryRank,
-      militaryDates: formData.militaryDates,
+      currentEmployer: formData.currentEmployer || '',
+      currentPosition: formData.currentPosition || '',
+      currentStartDate: formData.currentStartDate || '',
+      currentEndDate: formData.currentEndDate || '',
+      currentSalary: formData.currentSalary || '',
+      currentReasonForLeaving: formData.currentReasonForLeaving || '',
+      previousEmployment: formData.previousEmployment || [],
+      militaryService: formData.militaryService || false,
+      militaryBranch: formData.militaryBranch || '',
+      militaryRank: formData.militaryRank || '',
+      militaryDates: formData.militaryDates || '',
     },
   });
 
@@ -76,9 +75,8 @@ export function EmploymentHistoryForm() {
 
     try {
       // Filter out incomplete employment records before saving
-      const completeEmployment = data.previousEmployment.filter(emp =>
-        emp.employer.trim() && emp.position.trim() && emp.startDate.trim() &&
-        emp.endDate.trim() && emp.salary.trim() && emp.reasonForLeaving.trim()
+      const completeEmployment = (data.previousEmployment || []).filter(emp =>
+        emp.employer && emp.employer.trim() && emp.position && emp.position.trim()
       );
 
       // Update form context with employment history
@@ -132,7 +130,7 @@ export function EmploymentHistoryForm() {
         currentSalary: data.currentSalary,
         currentReasonForLeaving: data.currentReasonForLeaving,
 
-        // Previous Employment (filtered to complete entries only)
+        // Previous Employment (optional)
         previousEmployment: completeEmployment,
 
         // Driving History
@@ -193,12 +191,8 @@ export function EmploymentHistoryForm() {
           transition={{ duration: 0.5 }}
         >
           <p className="text-gray-700 leading-relaxed mb-6">
-            Please provide your complete employment history for the past 10 years. Federal regulations
-            require verification of your work history to ensure compliance with safety standards.
-            Include all employment, even non-driving positions.
-            <span className="font-medium text-blue-600 block mt-2">
-              Note: You must provide at least one complete previous employment record to continue.
-            </span>
+            Please provide your current employment information. Previous employment is optional
+            but helps us verify your work history.
           </p>
         </motion.div>
 
@@ -230,49 +224,47 @@ export function EmploymentHistoryForm() {
                 </h3>
 
                 <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="currentEmployer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700 font-medium">
+                          Employer Name <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="ABC Trucking Company"
+                            {...field}
+                            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="currentPosition"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700 font-medium">
+                          Position/Job Title <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Truck Driver"
+                            {...field}
+                            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="currentEmployer"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">
-                            Employer Name <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="ABC Trucking Company"
-                              {...field}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="currentPosition"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">
-                            Position/Job Title <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Truck Driver"
-                              {...field}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="currentStartDate"
@@ -281,24 +273,6 @@ export function EmploymentHistoryForm() {
                           <FormLabel className="text-gray-700 font-medium">
                             Start Date <span className="text-red-500">*</span>
                           </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="date"
-                              {...field}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="currentEndDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">End Date (if applicable)</FormLabel>
                           <FormControl>
                             <Input
                               type="date"
@@ -331,24 +305,6 @@ export function EmploymentHistoryForm() {
                       )}
                     />
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="currentReasonForLeaving"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">Reason for Leaving (if applicable)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Seeking better opportunities, career advancement, etc."
-                            {...field}
-                            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
               </Card>
             </motion.div>
@@ -362,10 +318,8 @@ export function EmploymentHistoryForm() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-blue-600" />
-                  Previous Employment (Past 10 Years)
-                  <span className="text-sm font-normal text-blue-600 block">
-                    At least one complete employment record required
-                  </span>
+                  Previous Employment
+                  <span className="text-sm font-normal text-gray-500">(Optional)</span>
                 </h3>
                 <Button
                   type="button"
@@ -379,13 +333,10 @@ export function EmploymentHistoryForm() {
                 </Button>
               </div>
 
-              {/* Show validation error for the array if needed */}
-              {form.formState.errors.previousEmployment?.message && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-800 text-sm font-medium">
-                    {form.formState.errors.previousEmployment.message}
-                  </p>
-                </div>
+              {fields.length === 0 && (
+                <p className="text-gray-500 text-sm mb-4">
+                  No previous employment added. Tap "Add Job" if you&apos;d like to include past positions.
+                </p>
               )}
 
               <div className="space-y-4">
@@ -398,65 +349,58 @@ export function EmploymentHistoryForm() {
                     transition={{ duration: 0.3 }}
                   >
                     <Card className="p-6 relative">
-                      {fields.length > 1 && (
-                        <Button
-                          type="button"
-                          onClick={() => remove(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <Button
+                        type="button"
+                        onClick={() => remove(index)}
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
 
                       <h4 className="font-medium text-gray-700 mb-4">
                         Previous Job #{index + 1}
-                        <span className="text-sm font-normal text-gray-500 ml-2">
-                          (Fill all fields to count as complete)
-                        </span>
                       </h4>
 
                       <div className="space-y-4">
+                        <FormField
+                          control={form.control}
+                          name={`previousEmployment.${index}.employer`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-700 font-medium">Employer Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="XYZ Logistics"
+                                  {...field}
+                                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`previousEmployment.${index}.position`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-700 font-medium">Position/Job Title</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Delivery Driver"
+                                  {...field}
+                                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name={`previousEmployment.${index}.employer`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-700 font-medium">Employer Name</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="XYZ Logistics"
-                                    {...field}
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`previousEmployment.${index}.position`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-700 font-medium">Position/Job Title</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Delivery Driver"
-                                    {...field}
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <FormField
                             control={form.control}
                             name={`previousEmployment.${index}.startDate`}
@@ -484,24 +428,6 @@ export function EmploymentHistoryForm() {
                                 <FormControl>
                                   <Input
                                     type="date"
-                                    {...field}
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`previousEmployment.${index}.salary`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-700 font-medium">Salary/Wage</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="$45,000/year"
                                     {...field}
                                     className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
                                   />
@@ -561,9 +487,6 @@ export function EmploymentHistoryForm() {
                           <FormLabel className="text-base font-medium">
                             I have served in the military
                           </FormLabel>
-                          <p className="text-sm text-gray-600">
-                            Check this box if you have served in any branch of the military
-                          </p>
                         </div>
                       </FormItem>
                     )}
@@ -645,8 +568,7 @@ export function EmploymentHistoryForm() {
             >
               <p className="text-green-800 text-sm">
                 <strong>Ready to Submit:</strong> Please review all information carefully before submitting.
-                Once submitted, your application will be stored securely and reviewed by our hiring team.
-                You will receive confirmation and next steps information.
+                Once submitted, your application will be reviewed by our hiring team.
               </p>
             </motion.div>
           </form>
