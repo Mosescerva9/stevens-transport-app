@@ -35,16 +35,6 @@ const employmentHistorySchema = z.object({
   militaryBranch: z.string().optional(),
   militaryRank: z.string().optional(),
   militaryDates: z.string().optional(),
-}).refine((data) => {
-  // At least one previous employment should be complete (all fields filled)
-  const completeEmployment = data.previousEmployment.filter(emp =>
-    emp.employer.trim() && emp.position.trim() && emp.startDate.trim() &&
-    emp.endDate.trim() && emp.salary.trim() && emp.reasonForLeaving.trim()
-  );
-  return completeEmployment.length >= 1;
-}, {
-  message: "Please provide at least one complete previous employment record",
-  path: ["previousEmployment"]
 });
 
 type EmploymentHistoryFormData = z.infer<typeof employmentHistorySchema>;
