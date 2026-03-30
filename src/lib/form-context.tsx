@@ -1,202 +1,136 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-// Define the form data structure
 export interface FormData {
-  // Personal Information
+  // Personal
   firstName: string;
   lastName: string;
-  middleName: string;
+  middleName?: string;
   socialSecurity: string;
   dateOfBirth: string;
   phone: string;
+  alternatePhone?: string;
   email: string;
 
-  // Current Address
+  // Address
   currentAddress: string;
   currentCity: string;
   currentState: string;
   currentZip: string;
   currentDuration: string;
   livedHereThreeYears: boolean;
-
-  // Previous Addresses (last 3 years)
   previousAddresses: Array<{
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    duration: string;
+    address: string; city: string; state: string; zip: string; duration: string;
   }>;
 
-  // Driver License Information
+  // License
   licenseNumber: string;
   licenseState: string;
   licenseExpiration: string;
-  cdlClass: string;
+  cdlClass?: string;
   endorsements: string[];
   restrictions: string[];
+  licenseImageFront?: string;
+  licenseImageBack?: string;
 
-  // Employment History
+  // Employment
   currentEmployer: string;
   currentPosition: string;
   currentStartDate: string;
-  currentEndDate: string;
+  currentEndDate?: string;
   currentSalary: string;
-  currentReasonForLeaving: string;
-
+  currentReasonForLeaving?: string;
+  currentSupervisorName?: string;
+  currentSupervisorPhone?: string;
+  canContactCurrentEmployer: boolean;
   previousEmployment: Array<{
-    employer: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    salary: string;
-    reasonForLeaving: string;
+    employer: string; position: string; startDate: string; endDate: string;
+    salary: string; reasonForLeaving: string; supervisorName?: string;
+    supervisorPhone?: string; canContact?: boolean;
   }>;
 
-  // Driving History
+  // Driving history
   accidents: Array<{
-    date: string;
-    description: string;
-    fatalities: boolean;
-    injuries: boolean;
+    date: string; description: string; fatalities: boolean; injuries: boolean;
+    location?: string; charges?: string;
   }>;
-
   violations: Array<{
-    date: string;
-    violation: string;
-    location: string;
+    date: string; violation: string; location: string; penalty?: string;
   }>;
 
-  // Military History
+  // Military
   militaryService: boolean;
-  militaryBranch: string;
-  militaryRank: string;
-  militaryDates: string;
+  militaryBranch?: string;
+  militaryRank?: string;
+  militaryDates?: string;
+  militaryDuties?: string;
 
-  // Submission Result
-  submissionResult?: {
-    id: string;
-    referenceNumber: string;
-    submittedAt: string;
-  };
+  // Additional questions
+  hasConvictions: boolean;
+  convictionsDetails?: string;
+  hasBeenBonded: boolean;
+  bondedDetails?: string;
+  canLiftFiftyLbs: boolean;
+  hasPhysicalLimits: boolean;
+  physicalLimitsDetails?: string;
+  availableWeekends: boolean;
+  availableOvernight: boolean;
+  expectedPay?: string;
+  howHeardAboutUs?: string;
+  referredBy?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelation?: string;
+  signature?: string;
+  signatureDate?: string;
 }
+
+const defaultFormData: FormData = {
+  firstName: '', lastName: '', socialSecurity: '', dateOfBirth: '', phone: '', email: '',
+  currentAddress: '', currentCity: '', currentState: '', currentZip: '',
+  currentDuration: '', livedHereThreeYears: false, previousAddresses: [],
+  licenseNumber: '', licenseState: '', licenseExpiration: '', endorsements: [], restrictions: [],
+  currentEmployer: '', currentPosition: '', currentStartDate: '', currentSalary: '',
+  canContactCurrentEmployer: true, previousEmployment: [],
+  accidents: [], violations: [],
+  militaryService: false,
+  hasConvictions: false, hasBeenBonded: false, canLiftFiftyLbs: false,
+  hasPhysicalLimits: false, availableWeekends: false, availableOvernight: false,
+};
 
 interface FormContextType {
   formData: FormData;
-  updateFormData: (section: string, data: unknown) => void;
+  updateFormData: (data: Partial<FormData>) => void;
   currentStep: number;
-  setCurrentStep: (step: number) => void;
-  isStepComplete: (step: number) => boolean;
+  nextStep: () => void;
+  prevStep: () => void;
   totalSteps: number;
 }
 
-const FormContext = createContext<FormContextType | undefined>(undefined);
+const FormContext = createContext<FormContextType | null>(null);
 
-// Initial form data
-const initialFormData: FormData = {
-  firstName: '',
-  lastName: '',
-  middleName: '',
-  socialSecurity: '',
-  dateOfBirth: '',
-  phone: '',
-  email: '',
-  currentAddress: '',
-  currentCity: '',
-  currentState: '',
-  currentZip: '',
-  currentDuration: '',
-  livedHereThreeYears: false,
-  previousAddresses: [],
-  licenseNumber: '',
-  licenseState: '',
-  licenseExpiration: '',
-  cdlClass: '',
-  endorsements: [],
-  restrictions: [],
-  currentEmployer: '',
-  currentPosition: '',
-  currentStartDate: '',
-  currentEndDate: '',
-  currentSalary: '',
-  currentReasonForLeaving: '',
-  previousEmployment: [],
-  accidents: [],
-  violations: [],
-  militaryService: false,
-  militaryBranch: '',
-  militaryRank: '',
-  militaryDates: '',
-  submissionResult: undefined,
-};
-
-export function FormProvider({ children }: { children: ReactNode }) {
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+export function FormProvider({ children }: { children: React.ReactNode }) {
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [currentStep, setCurrentStep] = useState(0);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
-  const updateFormData = (section: string, data: unknown) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: data,
-    }));
+  const updateFormData = (data: Partial<FormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
   };
 
-  const isStepComplete = (step: number): boolean => {
-    switch (step) {
-      case 0: // Welcome/Introduction
-        return true;
-      case 1: // Personal Information
-        return !!(formData.firstName && formData.lastName && formData.socialSecurity && formData.dateOfBirth);
-      case 2: // Address History
-        // Check if current address is complete
-        const currentAddressComplete = !!(formData.currentAddress && formData.currentCity && formData.currentState);
-
-        // If they've lived at current address for 3+ years, no previous addresses needed
-        if (formData.livedHereThreeYears) {
-          return currentAddressComplete;
-        }
-
-        // Otherwise, need at least one complete previous address
-        const completeAddresses = formData.previousAddresses.filter(addr =>
-          addr.address.trim() && addr.city.trim() && addr.state.trim() && addr.zip.trim() && addr.duration.trim()
-        );
-        return currentAddressComplete && completeAddresses.length >= 1;
-      case 3: // Driver License & Driving History
-        return !!(formData.licenseNumber && formData.licenseState);
-      case 4: // Employment History
-        // Check if current employment is complete AND at least one previous employment is complete
-        const currentEmploymentComplete = !!(formData.currentEmployer && formData.currentPosition);
-        const completeEmployment = formData.previousEmployment.filter(emp =>
-          emp.employer.trim() && emp.position.trim() && emp.startDate.trim() &&
-          emp.endDate.trim() && emp.salary.trim() && emp.reasonForLeaving.trim()
-        );
-        return currentEmploymentComplete && completeEmployment.length >= 1;
-      default:
-        return false;
-    }
-  };
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   return (
-    <FormContext.Provider value={{
-      formData,
-      updateFormData,
-      currentStep,
-      setCurrentStep,
-      isStepComplete,
-      totalSteps,
-    }}>
+    <FormContext.Provider value={{ formData, updateFormData, currentStep, nextStep, prevStep, totalSteps }}>
       {children}
     </FormContext.Provider>
   );
 }
 
-export function useForm() {
-  const context = useContext(FormContext);
-  if (context === undefined) {
-    throw new Error('useForm must be used within a FormProvider');
-  }
-  return context;
+export function useFormContext() {
+  const ctx = useContext(FormContext);
+  if (!ctx) throw new Error('useFormContext must be used within FormProvider');
+  return ctx;
 }

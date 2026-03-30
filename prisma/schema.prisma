@@ -1,12 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -16,13 +13,14 @@ model Application {
   updatedAt DateTime @updatedAt
 
   // Personal Information
-  firstName    String
-  lastName     String
-  middleName   String?
+  firstName      String
+  lastName       String
+  middleName     String?
   socialSecurity String
-  dateOfBirth  String
-  phone        String
-  email        String
+  dateOfBirth    String
+  phone          String
+  alternatePhone String?
+  email          String
 
   // Current Address
   currentAddress  String
@@ -37,8 +35,29 @@ model Application {
   licenseState      String
   licenseExpiration String
   cdlClass          String?
-  endorsements      String? // JSON string array
-  restrictions      String? // JSON string array
+  endorsements      String?
+  restrictions      String?
+  licenseImageFront String?
+  licenseImageBack  String?
+
+  // Additional Questions
+  hasConvictions        Boolean @default(false)
+  convictionsDetails    String?
+  hasBeenBonded         Boolean @default(false)
+  bondedDetails         String?
+  canLiftFiftyLbs       Boolean @default(false)
+  hasPhysicalLimits     Boolean @default(false)
+  physicalLimitsDetails String?
+  availableWeekends     Boolean @default(false)
+  availableOvernight    Boolean @default(false)
+  expectedPay           String?
+  howHeardAboutUs       String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  emergencyContactRelation String?
+  referredBy            String?
+  signature             String?
+  signatureDate         String?
 
   // Current Employment
   currentEmployer         String
@@ -47,21 +66,26 @@ model Application {
   currentEndDate          String?
   currentSalary           String
   currentReasonForLeaving String?
+  currentSupervisorName   String?
+  currentSupervisorPhone  String?
+  canContactCurrentEmployer Boolean @default(true)
 
   // Military Service
   militaryService Boolean @default(false)
   militaryBranch  String?
   militaryRank    String?
   militaryDates   String?
+  militaryDuties  String?
 
   // Application Status
-  status String @default("submitted") // submitted, under_review, approved, rejected
+  status String @default("submitted")
+  notes  String?
 
   // Related records
-  previousAddresses Address[]
+  previousAddresses  Address[]
   previousEmployment Employment[]
-  accidents        Accident[]
-  violations       Violation[]
+  accidents          Accident[]
+  violations         Violation[]
 
   @@map("applications")
 }
@@ -92,6 +116,9 @@ model Employment {
   endDate           String
   salary            String
   reasonForLeaving  String
+  supervisorName    String?
+  supervisorPhone   String?
+  canContact        Boolean @default(true)
 
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
@@ -107,6 +134,8 @@ model Accident {
   description String
   fatalities  Boolean @default(false)
   injuries    Boolean @default(false)
+  location    String?
+  charges     String?
 
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
@@ -121,6 +150,7 @@ model Violation {
   date      String
   violation String
   location  String
+  penalty   String?
 
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
