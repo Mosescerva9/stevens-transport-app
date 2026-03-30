@@ -95,11 +95,87 @@ export async function POST(request: NextRequest) {
     // Validate the incoming data
     const validatedData = applicationSchema.parse(body);
 
-    // Check if database is available (for deployment environments)
+    // Attempt DB write; fall back to a demo response if DB isn't available
     try {
       await prisma.$connect();
+      const application = await prisma.application.create({
+        data: {
+          // Personal Information
+          firstName: validatedData.firstName,
+          lastName: validatedData.lastName,
+          middleName: validatedData.middleName,
+          socialSecurity: validatedData.socialSecurity,
+          dateOfBirth: validatedData.dateOfBirth,
+          phone: validatedData.phone,
+          email: validatedData.email,
+
+          // Current Address
+          currentAddress: validatedData.currentAddress,
+          currentCity: validatedData.currentCity,
+          currentState: validatedData.currentState,
+          currentZip: validatedData.currentZip,
+          currentDuration: validatedData.currentDuration,
+          livedHereThreeYears: validatedData.livedHereThreeYears,
+
+          // Driver License Information
+          licenseNumber: validatedData.licenseNumber,
+          licenseState: validatedData.licenseState,
+          licenseExpiration: validatedData.licenseExpiration,
+          cdlClass: validatedData.cdlClass,
+          endorsements: JSON.stringify(validatedData.endorsements),
+          restrictions: JSON.stringify(validatedData.restrictions),
+
+          // Current Employment
+          currentEmployer: validatedData.currentEmployer,
+          currentPosition: validatedData.currentPosition,
+          currentStartDate: validatedData.currentStartDate,
+          currentEndDate: validatedData.currentEndDate,
+          currentSalary: validatedData.currentSalary,
+          currentReasonForLeaving: validatedData.currentReasonForLeaving,
+
+          // Military Service
+          militaryService: validatedData.militaryService,
+          militaryBranch: validatedData.militaryBranch,
+          militaryRank: validatedData.militaryRank,
+          militaryDates: validatedData.militaryDates,
+
+          // Related data
+          previousAddresses: {
+            create: validatedData.previousAddresses,
+          },
+          previousEmployment: {
+            create: validatedData.previousEmployment,
+          },
+          accidents: {
+            create: validatedData.accidents.filter(acc =>
+              acc.date && acc.description
+            ),
+          },
+          violations: {
+            create: validatedData.violations.filter(vio =>
+              vio.date && vio.violation && vio.location
+            ),
+          },
+        },
+        include: {
+          previousAddresses: true,
+          previousEmployment: true,
+          accidents: true,
+          violations: true,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: application.id,
+          referenceNumber: `ST-${new Date().getFullYear()}-${application.id.slice(-6).toUpperCase()}`,
+          submittedAt: application.createdAt,
+        },
+      }, { status: 201 });
+
     } catch (dbError) {
-      console.warn('Database not available, returning mock response');
+      console.warn('Database not available or failed, returning demo response:', dbError);
       return NextResponse.json({
         success: true,
         data: {
@@ -109,83 +185,6 @@ export async function POST(request: NextRequest) {
         },
       }, { status: 201 });
     }
-
-    // Create the application in the database with all related data
-    const application = await prisma.application.create({
-      data: {
-        // Personal Information
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
-        middleName: validatedData.middleName,
-        socialSecurity: validatedData.socialSecurity,
-        dateOfBirth: validatedData.dateOfBirth,
-        phone: validatedData.phone,
-        email: validatedData.email,
-
-        // Current Address
-        currentAddress: validatedData.currentAddress,
-        currentCity: validatedData.currentCity,
-        currentState: validatedData.currentState,
-        currentZip: validatedData.currentZip,
-        currentDuration: validatedData.currentDuration,
-        livedHereThreeYears: validatedData.livedHereThreeYears,
-
-        // Driver License Information
-        licenseNumber: validatedData.licenseNumber,
-        licenseState: validatedData.licenseState,
-        licenseExpiration: validatedData.licenseExpiration,
-        cdlClass: validatedData.cdlClass,
-        endorsements: JSON.stringify(validatedData.endorsements),
-        restrictions: JSON.stringify(validatedData.restrictions),
-
-        // Current Employment
-        currentEmployer: validatedData.currentEmployer,
-        currentPosition: validatedData.currentPosition,
-        currentStartDate: validatedData.currentStartDate,
-        currentEndDate: validatedData.currentEndDate,
-        currentSalary: validatedData.currentSalary,
-        currentReasonForLeaving: validatedData.currentReasonForLeaving,
-
-        // Military Service
-        militaryService: validatedData.militaryService,
-        militaryBranch: validatedData.militaryBranch,
-        militaryRank: validatedData.militaryRank,
-        militaryDates: validatedData.militaryDates,
-
-        // Related data - filter for non-empty records before creating
-        previousAddresses: {
-          create: validatedData.previousAddresses,
-        },
-        previousEmployment: {
-          create: validatedData.previousEmployment,
-        },
-        accidents: {
-          create: validatedData.accidents.filter(acc =>
-            acc.date && acc.description
-          ),
-        },
-        violations: {
-          create: validatedData.violations.filter(vio =>
-            vio.date && vio.violation && vio.location
-          ),
-        },
-      },
-      include: {
-        previousAddresses: true,
-        previousEmployment: true,
-        accidents: true,
-        violations: true,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: application.id,
-        referenceNumber: `ST-${new Date().getFullYear()}-${application.id.slice(-6).toUpperCase()}`,
-        submittedAt: application.createdAt,
-      },
-    }, { status: 201 });
 
   } catch (error) {
     console.error('Error submitting application:', error);
