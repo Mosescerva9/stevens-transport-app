@@ -1,13 +1,15 @@
 "use client";
 
 import { useFormContext } from '@/lib/form-context';
-import ProgressIndicator from './progress-indicator';
-import PersonalInfoForm from './forms/personal-info-form';
-import AddressHistoryForm from './forms/address-history-form';
-import DrivingHistoryForm from './forms/driving-history-form';
-import EmploymentHistoryForm from './forms/employment-history-form';
+import { ProgressIndicator } from './progress-indicator';
+import { PersonalInfoForm } from './forms/personal-info-form';
+import { AddressHistoryForm } from './forms/address-history-form';
+import { DrivingHistoryForm } from './forms/driving-history-form';
+import { EmploymentHistoryForm } from './forms/employment-history-form';
 import AdditionalQuestionsForm from './forms/additional-questions-form';
 import ReviewSubmitForm from './forms/review-submit-form';
+import { Button } from './ui/button';
+import React from 'react';
 
 const steps = [
   'Personal Info',
@@ -18,7 +20,48 @@ const steps = [
   'Review & Submit',
 ];
 
-export default function FormLayout() {
+// Section-level FormLayout used by individual form step components
+interface FormLayoutProps {
+  title?: string;
+  canGoNext?: boolean;
+  canGoPrevious?: boolean;
+  onNext?: (e?: React.BaseSyntheticEvent) => void | Promise<void>;
+  nextLabel?: string;
+  isLoading?: boolean;
+  children: React.ReactNode;
+}
+
+export function FormLayout({ title, canGoNext, canGoPrevious, onNext, nextLabel = 'Next →', isLoading, children }: FormLayoutProps) {
+  const { prevStep, currentStep } = useFormContext();
+
+  return (
+    <div>
+      {title && <h2 className="text-xl font-bold text-gray-900 mb-6">{title}</h2>}
+      {children}
+      <div className="flex justify-between mt-8">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={prevStep}
+          disabled={!canGoPrevious || currentStep === 0}
+        >
+          ← Back
+        </Button>
+        <Button
+          type="button"
+          onClick={onNext}
+          disabled={!canGoNext || isLoading}
+          className="bg-blue-700 hover:bg-blue-800 text-white"
+        >
+          {isLoading ? 'Saving...' : nextLabel}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Page-level layout used by page.tsx
+export default function AppFormLayout() {
   const { currentStep } = useFormContext();
 
   return (

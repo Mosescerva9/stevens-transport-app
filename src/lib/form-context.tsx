@@ -84,6 +84,8 @@ export interface FormData {
   emergencyContactRelation?: string;
   signature?: string;
   signatureDate?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  submissionResult?: any;
 }
 
 const defaultFormData: FormData = {
@@ -101,11 +103,15 @@ const defaultFormData: FormData = {
 
 interface FormContextType {
   formData: FormData;
-  updateFormData: (data: Partial<FormData>) => void;
+  // Supports both (key, value) and (data: Partial<FormData>) calling conventions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateFormData: (keyOrData: string | Partial<FormData>, value?: any) => void;
   currentStep: number;
+  setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
   totalSteps: number;
+  isStepComplete: (step: number) => boolean;
 }
 
 const FormContext = createContext<FormContextType | null>(null);
@@ -115,15 +121,31 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 6;
 
-  const updateFormData = (data: Partial<FormData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateFormData = (keyOrData: string | Partial<FormData>, value?: any) => {
+    if (typeof keyOrData === 'string') {
+      setFormData(prev => ({ ...prev, [keyOrData]: value }));
+    } else {
+      setFormData(prev => ({ ...prev, ...keyOrData }));
+    }
   };
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
+  const isStepComplete = (step: number) => step < currentStep;
+
   return (
-    <FormContext.Provider value={{ formData, updateFormData, currentStep, nextStep, prevStep, totalSteps }}>
+    <FormContext.Provider value={{
+      formData,
+      updateFormData,
+      currentStep,
+      setCurrentStep,
+      nextStep,
+      prevStep,
+      totalSteps,
+      isStepComplete,
+    }}>
       {children}
     </FormContext.Provider>
   );
@@ -134,3 +156,5 @@ export function useFormContext() {
   if (!ctx) throw new Error('useFormContext must be used within FormProvider');
   return ctx;
 }
+
+export const useForm = useFormContext;

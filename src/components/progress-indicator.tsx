@@ -4,16 +4,28 @@ import { Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useForm } from '@/lib/form-context';
 
-const steps = [
-  { id: 0, title: 'Introduction', description: 'Getting Started' },
-  { id: 1, title: 'Personal Info', description: 'Basic Information' },
-  { id: 2, title: 'Address History', description: 'Residence History' },
-  { id: 3, title: 'Driving Record', description: 'License & History' },
-  { id: 4, title: 'Employment', description: 'Work History' },
-];
+interface ProgressIndicatorProps {
+  steps?: string[];
+  currentStep?: number;
+}
 
-export function ProgressIndicator() {
-  const { currentStep, isStepComplete } = useForm();
+export function ProgressIndicator({ steps: stepsProp, currentStep: currentStepProp }: ProgressIndicatorProps) {
+  const { currentStep: ctxStep, isStepComplete } = useForm();
+
+  const currentStep = currentStepProp !== undefined ? currentStepProp : ctxStep;
+
+  const defaultStepObjects = [
+    { id: 0, title: 'Personal Info', description: 'Basic Information' },
+    { id: 1, title: 'Address History', description: 'Residence History' },
+    { id: 2, title: 'Employment', description: 'Work History' },
+    { id: 3, title: 'Driving Record', description: 'License & History' },
+    { id: 4, title: 'Additional Questions', description: 'Final Questions' },
+    { id: 5, title: 'Review & Submit', description: 'Submit Application' },
+  ];
+
+  const steps = stepsProp
+    ? stepsProp.map((title, id) => ({ id, title, description: '' }))
+    : defaultStepObjects;
 
   return (
     <div className="w-full bg-white border-b border-gray-200 px-6 py-4">
@@ -65,9 +77,11 @@ export function ProgressIndicator() {
                     <div className={`text-sm font-medium ${isActive ? 'text-blue-600 stevens-blue-text' : 'text-gray-900'}`}>
                       {step.title}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {step.description}
-                    </div>
+                    {step.description && (
+                      <div className="text-xs text-gray-500">
+                        {step.description}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -95,11 +109,13 @@ export function ProgressIndicator() {
         {/* Mobile Step Info */}
         <div className="sm:hidden mt-3 text-center">
           <div className="text-sm font-medium stevens-blue-text">
-            {steps[currentStep].title}
+            {steps[currentStep]?.title}
           </div>
-          <div className="text-xs text-gray-500">
-            Step {currentStep + 1} of {steps.length}: {steps[currentStep].description}
-          </div>
+          {steps[currentStep]?.description && (
+            <div className="text-xs text-gray-500">
+              Step {currentStep + 1} of {steps.length}: {steps[currentStep].description}
+            </div>
+          )}
         </div>
       </div>
     </div>
