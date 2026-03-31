@@ -70,107 +70,26 @@ export function EmploymentHistoryForm() {
   const militaryService = form.watch('militaryService');
 
   const onSubmit = async (data: EmploymentHistoryFormData) => {
-    setIsSubmitting(true);
-    setSubmitError(null);
+    // Filter out incomplete employment records
+    const completeEmployment = (data.previousEmployment || []).filter(emp =>
+      emp.employer && emp.employer.trim() && emp.position && emp.position.trim()
+    );
 
-    try {
-      // Filter out incomplete employment records before saving
-      const completeEmployment = (data.previousEmployment || []).filter(emp =>
-        emp.employer && emp.employer.trim() && emp.position && emp.position.trim()
-      );
+    // Save to form context and move to next step
+    updateFormData('currentEmployer', data.currentEmployer);
+    updateFormData('currentPosition', data.currentPosition);
+    updateFormData('currentStartDate', data.currentStartDate);
+    updateFormData('currentEndDate', data.currentEndDate);
+    updateFormData('currentSalary', data.currentSalary);
+    updateFormData('currentReasonForLeaving', data.currentReasonForLeaving);
+    updateFormData('previousEmployment', completeEmployment);
+    updateFormData('militaryService', data.militaryService);
+    updateFormData('militaryBranch', data.militaryBranch);
+    updateFormData('militaryRank', data.militaryRank);
+    updateFormData('militaryDates', data.militaryDates);
 
-      // Update form context with employment history
-      updateFormData('currentEmployer', data.currentEmployer);
-      updateFormData('currentPosition', data.currentPosition);
-      updateFormData('currentStartDate', data.currentStartDate);
-      updateFormData('currentEndDate', data.currentEndDate);
-      updateFormData('currentSalary', data.currentSalary);
-      updateFormData('currentReasonForLeaving', data.currentReasonForLeaving);
-      updateFormData('previousEmployment', completeEmployment);
-      updateFormData('militaryService', data.militaryService);
-      updateFormData('militaryBranch', data.militaryBranch);
-      updateFormData('militaryRank', data.militaryRank);
-      updateFormData('militaryDates', data.militaryDates);
-
-      // Prepare complete application data for submission
-      const completeApplicationData = {
-        // Personal Information
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        middleName: formData.middleName,
-        socialSecurity: formData.socialSecurity,
-        dateOfBirth: formData.dateOfBirth,
-        phone: formData.phone,
-        email: formData.email,
-
-        // Current Address
-        currentAddress: formData.currentAddress,
-        currentCity: formData.currentCity,
-        currentState: formData.currentState,
-        currentZip: formData.currentZip,
-        currentDuration: formData.currentDuration,
-        livedHereThreeYears: formData.livedHereThreeYears,
-
-        // Previous Addresses
-        previousAddresses: formData.previousAddresses,
-
-        // Driver License Information
-        licenseNumber: formData.licenseNumber,
-        licenseState: formData.licenseState,
-        licenseExpiration: formData.licenseExpiration,
-        cdlClass: formData.cdlClass,
-        endorsements: formData.endorsements,
-        restrictions: formData.restrictions,
-
-        // Current Employment (from this form)
-        currentEmployer: data.currentEmployer,
-        currentPosition: data.currentPosition,
-        currentStartDate: data.currentStartDate,
-        currentEndDate: data.currentEndDate,
-        currentSalary: data.currentSalary,
-        currentReasonForLeaving: data.currentReasonForLeaving,
-
-        // Previous Employment (optional)
-        previousEmployment: completeEmployment,
-
-        // Driving History
-        accidents: formData.accidents,
-        violations: formData.violations,
-
-        // Military Service
-        militaryService: data.militaryService,
-        militaryBranch: data.militaryBranch,
-        militaryRank: data.militaryRank,
-        militaryDates: data.militaryDates,
-      };
-
-      // Submit to backend API
-      const response = await fetch('/api/applications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(completeApplicationData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit application');
-      }
-
-      // Store the submission result
-      updateFormData('submissionResult', result.data);
-
-      // Move to success page
-      setCurrentStep(5);
-
-    } catch (error) {
-      console.error('Submission error:', error);
-      setSubmitError(error instanceof Error ? error.message : 'Failed to submit application');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Move to next step (Driving History)
+    setCurrentStep(3);
   };
 
   const isValid = form.formState.isValid;
@@ -178,11 +97,11 @@ export function EmploymentHistoryForm() {
   return (
     <FormLayout
       title="Employment History"
-      canGoNext={isValid && !isSubmitting}
+      canGoNext={true}
       canGoPrevious={true}
       onNext={form.handleSubmit(onSubmit)}
-      nextLabel="Submit Application"
-      isLoading={isSubmitting}
+      nextLabel="Next →"
+      
     >
       <div className="space-y-8">
         <motion.div
@@ -204,7 +123,7 @@ export function EmploymentHistoryForm() {
             animate={{ opacity: 1, y: 0 }}
           >
             <p className="text-red-800 text-sm">
-              <strong>Submission Error:</strong> {submitError}
+              <strong>Error:</strong> {submitError}
             </p>
           </motion.div>
         )}
@@ -567,8 +486,8 @@ export function EmploymentHistoryForm() {
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               <p className="text-green-800 text-sm">
-                <strong>Ready to Submit:</strong> Please review all information carefully before submitting.
-                Once submitted, your application will be reviewed by our hiring team.
+                <strong>Note:</strong> Please review all information carefully before submitting.
+                Previous employment is optional. Fill in what applies to you.
               </p>
             </motion.div>
           </form>
