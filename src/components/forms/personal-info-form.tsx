@@ -55,46 +55,12 @@ export function PersonalInfoForm() {
     setCurrentStep(1);
   };
 
-  const uploadTestImage = async (label: string): Promise<string | null> => {
-    // Create a simple test image using canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 250;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, 400, 250);
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`TEST LICENSE - ${label}`, 200, 120);
-    ctx.font = '14px Arial';
-    ctx.fillText('John A Smith - KS K12345678', 200, 160);
-
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) return null;
-
-    const fd = new FormData();
-    fd.append('file', blob, `test-license-${label.toLowerCase()}.png`);
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const result = await res.json();
-      return result.url || null;
-    } catch {
-      return null;
-    }
-  };
-
-  const fillTestData = async () => {
+  const fillTestData = () => {
     const today = new Date().toISOString().split('T')[0];
 
-    // Upload test license images
-    const [frontUrl, backUrl] = await Promise.all([
-      uploadTestImage('FRONT'),
-      uploadTestImage('BACK'),
-    ]);
-    if (frontUrl) updateFormData('licenseImageFront', frontUrl);
-    if (backUrl) updateFormData('licenseImageBack', backUrl);
+    // Use placeholder images for license (Cloudinary may not be configured)
+    updateFormData('licenseImageFront', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+FRONT');
+    updateFormData('licenseImageBack', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+BACK');
 
     // Fill personal info form fields
     form.setValue('firstName', 'John', { shouldValidate: true });
