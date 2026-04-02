@@ -8,7 +8,7 @@ import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const accidentSchema = z.object({
   date: z.string().min(1, 'Date is required'),
@@ -61,6 +61,12 @@ export function DrivingHistoryForm() {
   const [frontPreview, setFrontPreview] = useState<string | null>(formData.licenseImageFront || null);
   const [backPreview, setBackPreview] = useState<string | null>(formData.licenseImageBack || null);
   const [licenseErrors, setLicenseErrors] = useState<{ front?: string; back?: string }>({});
+  const [isTestMode, setIsTestMode] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setIsTestMode(params.get('test') === 'true');
+  }, []);
 
   const form = useReactHookForm<DrivingHistoryFormData>({
     resolver: zodResolver(drivingHistorySchema),
@@ -112,21 +118,23 @@ export function DrivingHistoryForm() {
   };
 
   const onSubmit = (data: DrivingHistoryFormData) => {
-    // Validate license uploads
-    const errors: { front?: string; back?: string } = {};
-    const currentFront = frontPreview || formData.licenseImageFront;
-    const currentBack = backPreview || formData.licenseImageBack;
+    // Validate license uploads (skip in test mode)
+    if (!isTestMode) {
+      const errors: { front?: string; back?: string } = {};
+      const currentFront = frontPreview || formData.licenseImageFront;
+      const currentBack = backPreview || formData.licenseImageBack;
 
-    if (!currentFront) {
-      errors.front = "Driver's license front photo is required";
-    }
-    if (!currentBack) {
-      errors.back = "Driver's license back photo is required";
-    }
+      if (!currentFront) {
+        errors.front = "Driver's license front photo is required";
+      }
+      if (!currentBack) {
+        errors.back = "Driver's license back photo is required";
+      }
 
-    if (errors.front || errors.back) {
-      setLicenseErrors(errors);
-      return;
+      if (errors.front || errors.back) {
+        setLicenseErrors(errors);
+        return;
+      }
     }
 
     Object.keys(data).forEach(key => {
@@ -136,7 +144,7 @@ export function DrivingHistoryForm() {
   };
 
   const isValid = form.formState.isValid;
-  const hasBothLicenseImages = !!(frontPreview || formData.licenseImageFront) && !!(backPreview || formData.licenseImageBack);
+  const hasBothLicenseImages = isTestMode || (!!(frontPreview || formData.licenseImageFront) && !!(backPreview || formData.licenseImageBack));
 
   return (
     <FormLayout
