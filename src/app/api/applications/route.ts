@@ -126,22 +126,54 @@ export async function POST(request: NextRequest) {
         signature: validatedData.signature || null,
         signatureDate: validatedData.signatureDate || null,
 
-        // Related data
+        // Related data — sanitize to only include fields Prisma expects
         previousAddresses: {
-          create: validatedData.previousAddresses,
+          create: (validatedData.previousAddresses || [])
+            .filter((addr: Record<string, unknown>) => addr.address && addr.city && addr.state && addr.zip)
+            .map((addr: Record<string, unknown>) => ({
+              address: String(addr.address || ''),
+              city: String(addr.city || ''),
+              state: String(addr.state || ''),
+              zip: String(addr.zip || ''),
+              duration: String(addr.duration || ''),
+            })),
         },
         previousEmployment: {
-          create: validatedData.previousEmployment,
+          create: (validatedData.previousEmployment || [])
+            .filter((emp: Record<string, unknown>) => emp.employer && emp.position)
+            .map((emp: Record<string, unknown>) => ({
+              employer: String(emp.employer || ''),
+              position: String(emp.position || ''),
+              startDate: String(emp.startDate || ''),
+              endDate: String(emp.endDate || ''),
+              salary: String(emp.salary || ''),
+              reasonForLeaving: String(emp.reasonForLeaving || ''),
+              supervisorName: emp.supervisorName ? String(emp.supervisorName) : null,
+              supervisorPhone: emp.supervisorPhone ? String(emp.supervisorPhone) : null,
+              canContact: emp.canContact !== false,
+            })),
         },
         accidents: {
-          create: validatedData.accidents.filter((acc: { date?: string; description?: string }) =>
-            acc.date && acc.description
-          ),
+          create: (validatedData.accidents || [])
+            .filter((acc: Record<string, unknown>) => acc.date && acc.description)
+            .map((acc: Record<string, unknown>) => ({
+              date: String(acc.date || ''),
+              description: String(acc.description || ''),
+              fatalities: acc.fatalities === true,
+              injuries: acc.injuries === true,
+              location: acc.location ? String(acc.location) : null,
+              charges: acc.charges ? String(acc.charges) : null,
+            })),
         },
         violations: {
-          create: validatedData.violations.filter((vio: { date?: string; violation?: string; location?: string }) =>
-            vio.date && vio.violation && vio.location
-          ),
+          create: (validatedData.violations || [])
+            .filter((vio: Record<string, unknown>) => vio.date && vio.violation && vio.location)
+            .map((vio: Record<string, unknown>) => ({
+              date: String(vio.date || ''),
+              violation: String(vio.violation || ''),
+              location: String(vio.location || ''),
+              penalty: vio.penalty ? String(vio.penalty) : null,
+            })),
         },
       },
       include: {
