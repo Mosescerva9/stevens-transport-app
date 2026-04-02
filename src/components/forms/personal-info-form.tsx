@@ -7,7 +7,7 @@ import { useForm } from '@/lib/form-context';
 import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -28,8 +28,12 @@ type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
 export function PersonalInfoForm() {
   const { formData, updateFormData, setCurrentStep } = useForm();
-  const searchParams = useSearchParams();
-  const showTestButton = searchParams.get('test') === 'true';
+  const [showTestButton, setShowTestButton] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowTestButton(params.get('test') === 'true');
+  }, []);
 
   const form = useReactHookForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
