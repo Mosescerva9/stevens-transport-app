@@ -7,6 +7,7 @@ import { useForm } from '@/lib/form-context';
 import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useSearchParams } from 'next/navigation';
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -27,6 +28,8 @@ type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
 export function PersonalInfoForm() {
   const { formData, updateFormData, setCurrentStep } = useForm();
+  const searchParams = useSearchParams();
+  const showTestButton = searchParams.get('test') === 'true';
 
   const form = useReactHookForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
@@ -46,6 +49,66 @@ export function PersonalInfoForm() {
       updateFormData(key, data[key as keyof PersonalInfoFormData]);
     });
     setCurrentStep(1);
+  };
+
+  const fillTestData = () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Fill personal info form fields
+    form.setValue('firstName', 'John', { shouldValidate: true });
+    form.setValue('middleName', 'A', { shouldValidate: true });
+    form.setValue('lastName', 'Smith', { shouldValidate: true });
+    form.setValue('socialSecurity', '999-88-7777', { shouldValidate: true });
+    form.setValue('dateOfBirth', '1995-06-15', { shouldValidate: true });
+    form.setValue('phone', '(555) 123-4567', { shouldValidate: true });
+    form.setValue('email', 'testdriver@gmail.com', { shouldValidate: true });
+
+    // Fill ALL other steps via updateFormData so they're pre-populated
+    // Address History (Step 1)
+    updateFormData('currentAddress', '123 Main St');
+    updateFormData('currentCity', 'Kansas City');
+    updateFormData('currentState', 'KS');
+    updateFormData('currentZip', '66101');
+    updateFormData('currentDuration', '4 years');
+    updateFormData('livedHereThreeYears', true);
+    updateFormData('previousAddresses', []);
+
+    // Employment (Step 2)
+    updateFormData('currentEmployer', 'ABC Trucking');
+    updateFormData('currentPosition', 'Driver');
+    updateFormData('currentStartDate', '2020-01-01');
+    updateFormData('currentEndDate', '');
+    updateFormData('currentSalary', '$50000');
+    updateFormData('currentReasonForLeaving', '');
+    updateFormData('previousEmployment', []);
+    updateFormData('militaryService', false);
+
+    // Driving History (Step 3)
+    updateFormData('licenseNumber', 'K12345678');
+    updateFormData('licenseState', 'KS');
+    updateFormData('licenseExpiration', '2028-01-01');
+    updateFormData('cdlClass', '');
+    updateFormData('endorsements', []);
+    updateFormData('restrictions', []);
+    updateFormData('accidents', []);
+    updateFormData('violations', []);
+
+    // Additional Questions (Step 4)
+    updateFormData('hasConvictions', false);
+    updateFormData('convictionsDetails', '');
+    updateFormData('canLiftFiftyLbs', true);
+    updateFormData('hasPhysicalLimits', false);
+    updateFormData('availableWeekends', true);
+    updateFormData('availableOvernight', false);
+    updateFormData('expectedPay', '$20/hr');
+    updateFormData('howHeardAboutUs', 'craigslist');
+    updateFormData('emergencyContactName', 'Jane Smith');
+    updateFormData('emergencyContactPhone', '555-987-6543');
+    updateFormData('emergencyContactRelation', 'Spouse');
+
+    // Signature (Step 4)
+    updateFormData('signature', 'John A Smith');
+    updateFormData('signatureDate', today);
   };
 
   const isValid = form.formState.isValid;
@@ -72,6 +135,16 @@ export function PersonalInfoForm() {
       onNext={form.handleSubmit(onSubmit)}
     >
       <div className="space-y-6">
+        {showTestButton && (
+          <button
+            type="button"
+            onClick={fillTestData}
+            className="px-3 py-1 text-xs font-medium border border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded"
+          >
+            Fill Test Data
+          </button>
+        )}
+
         <p className="text-sm text-gray-600 mb-4">
           Please provide your personal information exactly as it appears on your driver&apos;s license
           and Social Security card. This information will be used to verify your identity and

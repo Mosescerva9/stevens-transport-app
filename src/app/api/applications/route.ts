@@ -25,6 +25,8 @@ const applicationSchema = z.object({
   cdlClass: z.string().optional().default(''),
   endorsements: z.array(z.string()).optional().default([]),
   restrictions: z.array(z.string()).optional().default([]),
+  licenseImageFront: z.string().optional().default(''),
+  licenseImageBack: z.string().optional().default(''),
   currentEmployer: z.string().optional().default(''),
   currentPosition: z.string().optional().default(''),
   currentStartDate: z.string().optional().default(''),
@@ -38,6 +40,22 @@ const applicationSchema = z.object({
   militaryBranch: z.string().optional().default(''),
   militaryRank: z.string().optional().default(''),
   militaryDates: z.string().optional().default(''),
+  // Additional questions
+  hasConvictions: z.boolean().optional().default(false),
+  convictionsDetails: z.string().optional().default(''),
+  canLiftFiftyLbs: z.boolean().optional().default(false),
+  hasPhysicalLimits: z.boolean().optional().default(false),
+  physicalLimitsDetails: z.string().optional().default(''),
+  availableWeekends: z.boolean().optional().default(false),
+  availableOvernight: z.boolean().optional().default(false),
+  expectedPay: z.string().optional().default(''),
+  howHeardAboutUs: z.string().optional().default(''),
+  referredBy: z.string().optional().default(''),
+  emergencyContactName: z.string().optional().default(''),
+  emergencyContactPhone: z.string().optional().default(''),
+  emergencyContactRelation: z.string().optional().default(''),
+  signature: z.string().optional().default(''),
+  signatureDate: z.string().optional().default(''),
 }).passthrough();
 
 export async function POST(request: NextRequest) {
@@ -47,96 +65,101 @@ export async function POST(request: NextRequest) {
     // Validate the incoming data
     const validatedData = applicationSchema.parse(body);
 
-    // Attempt DB write; fall back to a demo response if DB isn't available
-    try {
-      await prisma.$connect();
-      const application = await prisma.application.create({
-        data: {
-          // Personal Information
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
-          middleName: validatedData.middleName,
-          socialSecurity: validatedData.socialSecurity,
-          dateOfBirth: validatedData.dateOfBirth,
-          phone: validatedData.phone,
-          email: validatedData.email,
+    // Save to database — NO silent fallback. If DB fails, return a real error.
+    const application = await prisma.application.create({
+      data: {
+        // Personal Information
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        middleName: validatedData.middleName,
+        socialSecurity: validatedData.socialSecurity,
+        dateOfBirth: validatedData.dateOfBirth,
+        phone: validatedData.phone,
+        email: validatedData.email,
 
-          // Current Address
-          currentAddress: validatedData.currentAddress,
-          currentCity: validatedData.currentCity,
-          currentState: validatedData.currentState,
-          currentZip: validatedData.currentZip,
-          currentDuration: validatedData.currentDuration,
-          livedHereThreeYears: validatedData.livedHereThreeYears,
+        // Current Address
+        currentAddress: validatedData.currentAddress,
+        currentCity: validatedData.currentCity,
+        currentState: validatedData.currentState,
+        currentZip: validatedData.currentZip,
+        currentDuration: validatedData.currentDuration,
+        livedHereThreeYears: validatedData.livedHereThreeYears,
 
-          // Driver License Information
-          licenseNumber: validatedData.licenseNumber,
-          licenseState: validatedData.licenseState,
-          licenseExpiration: validatedData.licenseExpiration,
-          cdlClass: validatedData.cdlClass,
-          endorsements: JSON.stringify(validatedData.endorsements),
-          restrictions: JSON.stringify(validatedData.restrictions),
+        // Driver License Information
+        licenseNumber: validatedData.licenseNumber,
+        licenseState: validatedData.licenseState,
+        licenseExpiration: validatedData.licenseExpiration,
+        cdlClass: validatedData.cdlClass,
+        endorsements: JSON.stringify(validatedData.endorsements),
+        restrictions: JSON.stringify(validatedData.restrictions),
+        licenseImageFront: validatedData.licenseImageFront || null,
+        licenseImageBack: validatedData.licenseImageBack || null,
 
-          // Current Employment
-          currentEmployer: validatedData.currentEmployer,
-          currentPosition: validatedData.currentPosition,
-          currentStartDate: validatedData.currentStartDate,
-          currentEndDate: validatedData.currentEndDate,
-          currentSalary: validatedData.currentSalary,
-          currentReasonForLeaving: validatedData.currentReasonForLeaving,
+        // Current Employment
+        currentEmployer: validatedData.currentEmployer,
+        currentPosition: validatedData.currentPosition,
+        currentStartDate: validatedData.currentStartDate,
+        currentEndDate: validatedData.currentEndDate,
+        currentSalary: validatedData.currentSalary,
+        currentReasonForLeaving: validatedData.currentReasonForLeaving,
 
-          // Military Service
-          militaryService: validatedData.militaryService,
-          militaryBranch: validatedData.militaryBranch,
-          militaryRank: validatedData.militaryRank,
-          militaryDates: validatedData.militaryDates,
+        // Military Service
+        militaryService: validatedData.militaryService,
+        militaryBranch: validatedData.militaryBranch,
+        militaryRank: validatedData.militaryRank,
+        militaryDates: validatedData.militaryDates,
 
-          // Related data
-          previousAddresses: {
-            create: validatedData.previousAddresses,
-          },
-          previousEmployment: {
-            create: validatedData.previousEmployment,
-          },
-          accidents: {
-            create: validatedData.accidents.filter(acc =>
-              acc.date && acc.description
-            ),
-          },
-          violations: {
-            create: validatedData.violations.filter(vio =>
-              vio.date && vio.violation && vio.location
-            ),
-          },
+        // Additional Questions
+        hasConvictions: validatedData.hasConvictions,
+        convictionsDetails: validatedData.convictionsDetails || null,
+        canLiftFiftyLbs: validatedData.canLiftFiftyLbs,
+        hasPhysicalLimits: validatedData.hasPhysicalLimits,
+        physicalLimitsDetails: validatedData.physicalLimitsDetails || null,
+        availableWeekends: validatedData.availableWeekends,
+        availableOvernight: validatedData.availableOvernight,
+        expectedPay: validatedData.expectedPay || null,
+        howHeardAboutUs: validatedData.howHeardAboutUs || null,
+        referredBy: validatedData.referredBy || null,
+        emergencyContactName: validatedData.emergencyContactName || null,
+        emergencyContactPhone: validatedData.emergencyContactPhone || null,
+        emergencyContactRelation: validatedData.emergencyContactRelation || null,
+        signature: validatedData.signature || null,
+        signatureDate: validatedData.signatureDate || null,
+
+        // Related data
+        previousAddresses: {
+          create: validatedData.previousAddresses,
         },
-        include: {
-          previousAddresses: true,
-          previousEmployment: true,
-          accidents: true,
-          violations: true,
+        previousEmployment: {
+          create: validatedData.previousEmployment,
         },
-      });
+        accidents: {
+          create: validatedData.accidents.filter((acc: { date?: string; description?: string }) =>
+            acc.date && acc.description
+          ),
+        },
+        violations: {
+          create: validatedData.violations.filter((vio: { date?: string; violation?: string; location?: string }) =>
+            vio.date && vio.violation && vio.location
+          ),
+        },
+      },
+      include: {
+        previousAddresses: true,
+        previousEmployment: true,
+        accidents: true,
+        violations: true,
+      },
+    });
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          id: application.id,
-          referenceNumber: `ST-${new Date().getFullYear()}-${application.id.slice(-6).toUpperCase()}`,
-          submittedAt: application.createdAt,
-        },
-      }, { status: 201 });
-
-    } catch (dbError) {
-      console.warn('Database not available or failed, returning demo response:', dbError);
-      return NextResponse.json({
-        success: true,
-        data: {
-          id: 'demo-' + Date.now(),
-          referenceNumber: `ST-${new Date().getFullYear()}-DEMO${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
-          submittedAt: new Date().toISOString(),
-        },
-      }, { status: 201 });
-    }
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: application.id,
+        referenceNumber: `ST-${new Date().getFullYear()}-${application.id.slice(-6).toUpperCase()}`,
+        submittedAt: application.createdAt,
+      },
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Error submitting application:', error);
@@ -151,7 +174,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: false,
-      error: 'Failed to submit application. Please try again.',
+      error: 'Failed to submit application. Database error — please try again or contact support.',
+      details: error instanceof Error ? error.message : String(error),
     }, { status: 500 });
   }
 }
@@ -163,25 +187,6 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') ?? '1');
     const limit = parseInt(searchParams.get('limit') ?? '10');
     const skip = (page - 1) * limit;
-
-    // Check if database is available (for deployment environments)
-    try {
-      await prisma.$connect();
-    } catch (dbError) {
-      console.warn('Database not available, returning mock response');
-      return NextResponse.json({
-        success: true,
-        data: {
-          applications: [],
-          pagination: {
-            page,
-            limit,
-            total: 0,
-            pages: 0,
-          },
-        },
-      });
-    }
 
     const applications = await prisma.application.findMany({
       include: {
@@ -221,6 +226,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Failed to fetch applications',
+      details: error instanceof Error ? error.message : String(error),
     }, { status: 500 });
   }
 }

@@ -60,6 +60,7 @@ export function DrivingHistoryForm() {
   const [uploadingBack, setUploadingBack] = useState(false);
   const [frontPreview, setFrontPreview] = useState<string | null>(formData.licenseImageFront || null);
   const [backPreview, setBackPreview] = useState<string | null>(formData.licenseImageBack || null);
+  const [licenseErrors, setLicenseErrors] = useState<{ front?: string; back?: string }>({});
 
   const form = useReactHookForm<DrivingHistoryFormData>({
     resolver: zodResolver(drivingHistorySchema),
@@ -90,6 +91,9 @@ export function DrivingHistoryForm() {
     const previewSetter = side === 'front' ? setFrontPreview : setBackPreview;
     const fieldKey = side === 'front' ? 'licenseImageFront' : 'licenseImageBack';
 
+    // Clear error for this side
+    setLicenseErrors(prev => ({ ...prev, [side]: undefined }));
+
     setter(true);
     try {
       const fd = new FormData();
@@ -108,6 +112,23 @@ export function DrivingHistoryForm() {
   };
 
   const onSubmit = (data: DrivingHistoryFormData) => {
+    // Validate license uploads
+    const errors: { front?: string; back?: string } = {};
+    const currentFront = frontPreview || formData.licenseImageFront;
+    const currentBack = backPreview || formData.licenseImageBack;
+
+    if (!currentFront) {
+      errors.front = "Driver's license front photo is required";
+    }
+    if (!currentBack) {
+      errors.back = "Driver's license back photo is required";
+    }
+
+    if (errors.front || errors.back) {
+      setLicenseErrors(errors);
+      return;
+    }
+
     Object.keys(data).forEach(key => {
       updateFormData(key, data[key as keyof DrivingHistoryFormData]);
     });
@@ -115,11 +136,12 @@ export function DrivingHistoryForm() {
   };
 
   const isValid = form.formState.isValid;
+  const hasBothLicenseImages = !!(frontPreview || formData.licenseImageFront) && !!(backPreview || formData.licenseImageBack);
 
   return (
     <FormLayout
       title="Driver License & Driving History"
-      canGoNext={isValid}
+      canGoNext={isValid && hasBothLicenseImages}
       canGoPrevious={true}
       onNext={form.handleSubmit(onSubmit)}
     >
@@ -219,16 +241,16 @@ export function DrivingHistoryForm() {
             {/* License Photo Upload */}
             <div className="border border-gray-300 p-4">
               <div className="bg-gray-100 -mx-4 -mt-4 mb-4 px-4 py-2 border-b border-gray-300">
-                <h3 className="text-xs font-bold text-gray-700 uppercase">Driver&apos;s License Photo Upload</h3>
+                <h3 className="text-xs font-bold text-gray-700 uppercase">Driver&apos;s License Photo Upload <span className="text-red-500">*</span></h3>
               </div>
               <p className="text-xs text-gray-500 mb-4">
-                Upload a clear photo of the front and back of your driver&apos;s license. Accepted formats: JPG, PNG, PDF.
+                Upload a clear photo of the front and back of your driver&apos;s license. Accepted formats: JPG, PNG, PDF. <strong>Both photos are required.</strong>
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Front */}
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
-                    License Front
+                    License Front <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="file"
@@ -246,11 +268,14 @@ export function DrivingHistoryForm() {
                       <p className="text-xs text-green-600 mt-1">Uploaded</p>
                     </div>
                   )}
+                  {licenseErrors.front && (
+                    <p className="text-red-500 text-xs mt-1">{licenseErrors.front}</p>
+                  )}
                 </div>
                 {/* Back */}
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
-                    License Back
+                    License Back <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="file"
@@ -267,6 +292,9 @@ export function DrivingHistoryForm() {
                       <img src={backPreview} alt="License back" className="h-24 border border-gray-300 object-cover" />
                       <p className="text-xs text-green-600 mt-1">Uploaded</p>
                     </div>
+                  )}
+                  {licenseErrors.back && (
+                    <p className="text-red-500 text-xs mt-1">{licenseErrors.back}</p>
                   )}
                 </div>
               </div>
