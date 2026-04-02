@@ -2,91 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-// Validation schema for the complete application
+// Lenient validation — accept whatever the form sends
 const applicationSchema = z.object({
-  // Personal Information
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  middleName: z.string().optional(),
-  socialSecurity: z.string().min(9, 'Social Security Number is required'),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
-  phone: z.string().min(10, 'Phone number is required'),
-  email: z.string().email('Valid email is required'),
+  middleName: z.string().optional().default(''),
+  socialSecurity: z.string().optional().default(''),
+  dateOfBirth: z.string().optional().default(''),
+  phone: z.string().optional().default(''),
+  email: z.string().optional().default(''),
 
-  // Current Address
-  currentAddress: z.string().min(1, 'Current address is required'),
-  currentCity: z.string().min(1, 'Current city is required'),
-  currentState: z.string().min(2, 'Current state is required'),
-  currentZip: z.string().min(5, 'Current ZIP code is required'),
-  currentDuration: z.string().min(1, 'Duration at current address is required'),
-  livedHereThreeYears: z.boolean(),
-
-  // Previous Addresses (already filtered client-side, so all should be complete)
-  // Empty array is allowed if livedHereThreeYears is true
-  previousAddresses: z.array(z.object({
-    address: z.string().min(1, 'Address is required'),
-    city: z.string().min(1, 'City is required'),
-    state: z.string().min(2, 'State is required'),
-    zip: z.string().min(5, 'ZIP code is required'),
-    duration: z.string().min(1, 'Duration is required'),
-  })),
-
-  // Driver License Information
-  licenseNumber: z.string().min(1, 'License number is required'),
-  licenseState: z.string().min(2, 'License state is required'),
-  licenseExpiration: z.string().min(1, 'License expiration is required'),
-  cdlClass: z.string().optional(),
-  endorsements: z.array(z.string()),
-  restrictions: z.array(z.string()),
-
-  // Current Employment
-  currentEmployer: z.string().min(1, 'Current employer is required'),
-  currentPosition: z.string().min(1, 'Current position is required'),
-  currentStartDate: z.string().min(1, 'Current job start date is required'),
-  currentEndDate: z.string().optional(),
-  currentSalary: z.string().min(1, 'Current salary is required'),
-  currentReasonForLeaving: z.string().optional(),
-
-  // Previous Employment (already filtered client-side, so all should be complete)
-  previousEmployment: z.array(z.object({
-    employer: z.string().min(1, 'Employer is required'),
-    position: z.string().min(1, 'Position is required'),
-    startDate: z.string().min(1, 'Start date is required'),
-    endDate: z.string().min(1, 'End date is required'),
-    salary: z.string().min(1, 'Salary is required'),
-    reasonForLeaving: z.string().min(1, 'Reason for leaving is required'),
-  })),
-
-  // Driving History (optional arrays)
-  accidents: z.array(z.object({
-    date: z.string(),
-    description: z.string(),
-    fatalities: z.boolean(),
-    injuries: z.boolean(),
-  })),
-
-  violations: z.array(z.object({
-    date: z.string(),
-    violation: z.string(),
-    location: z.string(),
-  })),
-
-  // Military Service
-  militaryService: z.boolean(),
-  militaryBranch: z.string().optional(),
-  militaryRank: z.string().optional(),
-  militaryDates: z.string().optional(),
-}).refine((data) => {
-  // Validate address history logic: if they haven't lived at current address for 3+ years,
-  // they need at least one previous address
-  if (!data.livedHereThreeYears && data.previousAddresses.length === 0) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Previous addresses are required if you haven't lived at your current address for 3+ years",
-  path: ["previousAddresses"]
-});
+  currentAddress: z.string().optional().default(''),
+  currentCity: z.string().optional().default(''),
+  currentState: z.string().optional().default(''),
+  currentZip: z.string().optional().default(''),
+  currentDuration: z.string().optional().default(''),
+  livedHereThreeYears: z.boolean().optional().default(false),
+  previousAddresses: z.array(z.any()).optional().default([]),
+  licenseNumber: z.string().optional().default(''),
+  licenseState: z.string().optional().default(''),
+  licenseExpiration: z.string().optional().default(''),
+  cdlClass: z.string().optional().default(''),
+  endorsements: z.array(z.string()).optional().default([]),
+  restrictions: z.array(z.string()).optional().default([]),
+  currentEmployer: z.string().optional().default(''),
+  currentPosition: z.string().optional().default(''),
+  currentStartDate: z.string().optional().default(''),
+  currentEndDate: z.string().optional().default(''),
+  currentSalary: z.string().optional().default(''),
+  currentReasonForLeaving: z.string().optional().default(''),
+  previousEmployment: z.array(z.any()).optional().default([]),
+  accidents: z.array(z.any()).optional().default([]),
+  violations: z.array(z.any()).optional().default([]),
+  militaryService: z.boolean().optional().default(false),
+  militaryBranch: z.string().optional().default(''),
+  militaryRank: z.string().optional().default(''),
+  militaryDates: z.string().optional().default(''),
+}).passthrough();
 
 export async function POST(request: NextRequest) {
   try {
