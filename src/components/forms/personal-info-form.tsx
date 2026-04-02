@@ -3,7 +3,6 @@
 import { useForm as useReactHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import { useForm } from '@/lib/form-context';
 import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -43,13 +42,10 @@ export function PersonalInfoForm() {
   });
 
   const onSubmit = (data: PersonalInfoFormData) => {
-    // Update form context with personal info
     Object.keys(data).forEach(key => {
       updateFormData(key, data[key as keyof PersonalInfoFormData]);
     });
-
-    // Move to next step
-    setCurrentStep(2);
+    setCurrentStep(1);
   };
 
   const isValid = form.formState.isValid;
@@ -76,37 +72,25 @@ export function PersonalInfoForm() {
       onNext={form.handleSubmit(onSubmit)}
     >
       <div className="space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-gray-700 leading-relaxed mb-6">
-            Please provide your personal information exactly as it appears on your driver's license
-            and Social Security card. This information will be used to verify your identity and
-            conduct background checks as required by federal regulations.
-          </p>
-        </motion.div>
+        <p className="text-sm text-gray-600 mb-4">
+          Please provide your personal information exactly as it appears on your driver&apos;s license
+          and Social Security card. This information will be used to verify your identity and
+          conduct background checks as required by federal regulations.
+        </p>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name Fields */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       First Name <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} className="transition-all duration-200 focus:ring-2 focus:ring-blue-500" />
+                      <Input placeholder="John" {...field} className="border-gray-300 text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,9 +102,9 @@ export function PersonalInfoForm() {
                 name="middleName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">Middle Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Middle Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Michael" {...field} className="transition-all duration-200 focus:ring-2 focus:ring-blue-500" />
+                      <Input placeholder="Michael" {...field} className="border-gray-300 text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -132,31 +116,25 @@ export function PersonalInfoForm() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       Last Name <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Smith" {...field} className="transition-all duration-200 focus:ring-2 focus:ring-blue-500" />
+                      <Input placeholder="Smith" {...field} className="border-gray-300 text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </motion.div>
+            </div>
 
-            {/* SSN and DOB */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="socialSecurity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       Social Security Number <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -168,7 +146,7 @@ export function PersonalInfoForm() {
                           field.onChange(formatted);
                         }}
                         maxLength={11}
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                        className="border-gray-300 text-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -181,35 +159,25 @@ export function PersonalInfoForm() {
                 name="dateOfBirth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       Date of Birth <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                      />
+                      <Input type="date" {...field} className="border-gray-300 text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </motion.div>
+            </div>
 
-            {/* Contact Information */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       Phone Number <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -221,7 +189,7 @@ export function PersonalInfoForm() {
                           field.onChange(formatted);
                         }}
                         maxLength={14}
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                        className="border-gray-300 text-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -234,35 +202,22 @@ export function PersonalInfoForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
+                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
                       Email Address <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="john.smith@email.com"
-                        {...field}
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                      />
+                      <Input type="email" placeholder="john.smith@email.com" {...field} className="border-gray-300 text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </motion.div>
+            </div>
 
-            {/* Note */}
-            <motion.div
-              className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <p className="text-blue-800 text-sm">
-                <strong>Note:</strong> All information must be accurate and complete.
-                False or misleading information may result in disqualification from employment.
-              </p>
-            </motion.div>
+            <div className="p-3 bg-blue-50 border border-blue-200 text-sm text-blue-800">
+              <strong>Note:</strong> All information must be accurate and complete.
+              False or misleading information may result in disqualification from employment.
+            </div>
           </form>
         </Form>
       </div>

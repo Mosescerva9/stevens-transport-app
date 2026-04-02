@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormContext } from '@/lib/form-context';
-import { Button } from '../ui/button';
 import { useState } from 'react';
 
 export default function AdditionalQuestionsForm() {
@@ -22,24 +21,26 @@ export default function AdditionalQuestionsForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-1">Additional Questions</h2>
-      <p className="text-gray-500 text-sm mb-6">Please answer all questions honestly. A criminal record does not automatically disqualify you.</p>
+      <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 -mx-6 -mt-6 mb-6">
+        <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Additional Questions</h2>
+      </div>
+      <p className="text-sm text-gray-500 mb-6">Please answer all questions honestly. A criminal record does not automatically disqualify you.</p>
 
       <div className="space-y-6">
 
         {/* Convictions */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="border border-gray-300 p-4">
+          <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
             Have you ever been convicted of a felony or misdemeanor (excluding minor traffic violations)?
           </label>
           <div className="flex gap-4 mb-2">
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm">
               <input type="radio" name="hasConvictions" value="true"
                 checked={formData.hasConvictions === true}
                 onChange={() => updateFormData({ hasConvictions: true })}
               /> Yes
             </label>
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm">
               <input type="radio" name="hasConvictions" value="false"
                 checked={formData.hasConvictions === false}
                 onChange={() => updateFormData({ hasConvictions: false })}
@@ -48,8 +49,8 @@ export default function AdditionalQuestionsForm() {
           </div>
           {formData.hasConvictions && (
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Please provide details (date, offense, outcome):</label>
-              <textarea className="w-full border rounded-lg p-2 text-sm" rows={3}
+              <label className="block text-xs text-gray-600 mb-1">Please provide details (date, offense, outcome):</label>
+              <textarea className="w-full border border-gray-300 p-2 text-sm" rows={3}
                 value={formData.convictionsDetails || ''}
                 onChange={e => updateFormData({ convictionsDetails: e.target.value })}
                 placeholder="Describe the conviction(s)..."
@@ -59,8 +60,8 @@ export default function AdditionalQuestionsForm() {
         </div>
 
         {/* Physical Requirements */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <p className="text-sm font-medium text-gray-700 mb-3">Physical Requirements</p>
+        <div className="border border-gray-300 p-4">
+          <p className="text-xs font-semibold text-gray-700 uppercase mb-3">Physical Requirements</p>
           <div className="space-y-3">
             <label className="flex items-center gap-3">
               <input type="checkbox" checked={formData.canLiftFiftyLbs || false}
@@ -77,7 +78,7 @@ export default function AdditionalQuestionsForm() {
               <span className="text-sm text-gray-700">I have physical limitations that may affect my ability to perform this job</span>
             </label>
             {formData.hasPhysicalLimits && (
-              <textarea className="w-full border rounded-lg p-2 text-sm mt-1" rows={2}
+              <textarea className="w-full border border-gray-300 p-2 text-sm mt-1" rows={2}
                 value={formData.physicalLimitsDetails || ''}
                 onChange={e => updateFormData({ physicalLimitsDetails: e.target.value })}
                 placeholder="Describe your limitations..."
@@ -87,8 +88,8 @@ export default function AdditionalQuestionsForm() {
         </div>
 
         {/* Availability */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <p className="text-sm font-medium text-gray-700 mb-3">Availability</p>
+        <div className="border border-gray-300 p-4">
+          <p className="text-xs font-semibold text-gray-700 uppercase mb-3">Availability</p>
           <div className="space-y-2">
             <label className="flex items-center gap-3">
               <input type="checkbox" checked={formData.availableWeekends || false}
@@ -110,16 +111,16 @@ export default function AdditionalQuestionsForm() {
         {/* Pay & Referral */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Expected Pay (per hour or weekly)</label>
-            <input type="text" className="w-full border rounded-lg p-2 text-sm"
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Expected Pay</label>
+            <input type="text" className="w-full border border-gray-300 p-2 text-sm"
               value={formData.expectedPay || ''}
               onChange={e => updateFormData({ expectedPay: e.target.value })}
               placeholder="e.g. $18/hr or $900/week"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">How did you hear about this position?</label>
-            <select className="w-full border rounded-lg p-2 text-sm"
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">How did you hear about us?</label>
+            <select className="w-full border border-gray-300 p-2 text-sm"
               value={formData.howHeardAboutUs || ''}
               onChange={e => updateFormData({ howHeardAboutUs: e.target.value })}>
               <option value="">Select...</option>
@@ -134,8 +135,8 @@ export default function AdditionalQuestionsForm() {
 
         {formData.howHeardAboutUs === 'referral' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Who referred you?</label>
-            <input type="text" className="w-full border rounded-lg p-2 text-sm"
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Who referred you?</label>
+            <input type="text" className="w-full border border-gray-300 p-2 text-sm"
               value={formData.referredBy || ''}
               onChange={e => updateFormData({ referredBy: e.target.value })}
               placeholder="Employee name"
@@ -144,26 +145,26 @@ export default function AdditionalQuestionsForm() {
         )}
 
         {/* Emergency Contact */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <p className="text-sm font-medium text-gray-700 mb-3">Emergency Contact</p>
+        <div className="border border-gray-300 p-4">
+          <p className="text-xs font-semibold text-gray-700 uppercase mb-3">Emergency Contact</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs text-gray-600 mb-1">Full Name</label>
-              <input type="text" className="w-full border rounded-lg p-2 text-sm"
+              <input type="text" className="w-full border border-gray-300 p-2 text-sm"
                 value={formData.emergencyContactName || ''}
                 onChange={e => updateFormData({ emergencyContactName: e.target.value })}
               />
             </div>
             <div>
               <label className="block text-xs text-gray-600 mb-1">Phone Number</label>
-              <input type="tel" className="w-full border rounded-lg p-2 text-sm"
+              <input type="tel" className="w-full border border-gray-300 p-2 text-sm"
                 value={formData.emergencyContactPhone || ''}
                 onChange={e => updateFormData({ emergencyContactPhone: e.target.value })}
               />
             </div>
             <div>
               <label className="block text-xs text-gray-600 mb-1">Relationship</label>
-              <input type="text" className="w-full border rounded-lg p-2 text-sm"
+              <input type="text" className="w-full border border-gray-300 p-2 text-sm"
                 value={formData.emergencyContactRelation || ''}
                 onChange={e => updateFormData({ emergencyContactRelation: e.target.value })}
                 placeholder="Spouse, Parent, etc."
@@ -173,8 +174,8 @@ export default function AdditionalQuestionsForm() {
         </div>
 
         {/* Certification & Signature */}
-        <div className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
-          <p className="text-sm font-medium text-gray-900 mb-2">Certification & Electronic Signature</p>
+        <div className="border-2 border-blue-300 p-4 bg-blue-50">
+          <p className="text-xs font-semibold text-gray-900 uppercase mb-2">Certification & Electronic Signature</p>
           <p className="text-xs text-gray-600 mb-3">
             I certify that all information provided in this application is true and complete to the best of my knowledge.
             I understand that false information or omissions may disqualify me from consideration or result in termination.
@@ -184,7 +185,7 @@ export default function AdditionalQuestionsForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-600 mb-1">Type your full legal name as signature *</label>
-              <input type="text" className={`w-full border rounded-lg p-2 text-sm font-medium ${errors.signature ? 'border-red-400' : ''}`}
+              <input type="text" className={`w-full border p-2 text-sm font-medium ${errors.signature ? 'border-red-400' : 'border-gray-300'}`}
                 value={formData.signature || ''}
                 onChange={e => updateFormData({ signature: e.target.value })}
                 placeholder="Your full legal name"
@@ -193,7 +194,7 @@ export default function AdditionalQuestionsForm() {
             </div>
             <div>
               <label className="block text-xs text-gray-600 mb-1">Date *</label>
-              <input type="date" className={`w-full border rounded-lg p-2 text-sm ${errors.signatureDate ? 'border-red-400' : ''}`}
+              <input type="date" className={`w-full border p-2 text-sm ${errors.signatureDate ? 'border-red-400' : 'border-gray-300'}`}
                 value={formData.signatureDate || ''}
                 onChange={e => updateFormData({ signatureDate: e.target.value })}
               />
@@ -203,9 +204,21 @@ export default function AdditionalQuestionsForm() {
         </div>
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Button variant="outline" onClick={prevStep}>← Back</Button>
-        <Button onClick={handleNext} className="bg-blue-700 hover:bg-blue-800 text-white">Review Application →</Button>
+      <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
+        <button
+          type="button"
+          onClick={prevStep}
+          className="px-5 py-2 text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:bg-gray-50"
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleNext}
+          className="px-6 py-2 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800"
+        >
+          Review Application
+        </button>
       </div>
     </div>
   );

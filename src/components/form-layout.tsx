@@ -31,30 +31,34 @@ interface FormLayoutProps {
   children: React.ReactNode;
 }
 
-export function FormLayout({ title, canGoNext, canGoPrevious, onNext, nextLabel = 'Next →', isLoading, children }: FormLayoutProps) {
+export function FormLayout({ title, canGoNext, canGoPrevious, onNext, nextLabel = 'Next', isLoading, children }: FormLayoutProps) {
   const { prevStep, currentStep } = useFormContext();
 
   return (
     <div>
-      {title && <h2 className="text-xl font-bold text-gray-900 mb-6">{title}</h2>}
+      {title && (
+        <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 -mx-6 -mt-6 mb-6">
+          <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">{title}</h2>
+        </div>
+      )}
       {children}
-      <div className="flex justify-between mt-8">
-        <Button
+      <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
+        <button
           type="button"
-          variant="outline"
           onClick={prevStep}
           disabled={!canGoPrevious || currentStep === 0}
+          className="px-5 py-2 text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          ← Back
-        </Button>
-        <Button
+          Back
+        </button>
+        <button
           type="button"
           onClick={onNext}
           disabled={!canGoNext || isLoading}
-          className="bg-blue-700 hover:bg-blue-800 text-white"
+          className="px-6 py-2 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Saving...' : nextLabel}
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -65,26 +69,24 @@ export default function AppFormLayout() {
   const { currentStep } = useFormContext();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-blue-800 text-white shadow-lg">
-        <div className="max-w-4xl mx-auto px-6 py-5">
-          <div className="flex items-center gap-4">
-            <div className="bg-white rounded-full w-12 h-12 flex items-center justify-center">
-              <span className="text-blue-800 font-bold text-lg">AR</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Allied Refreshment Distributing</h1>
-              <p className="text-blue-200 text-sm">Driver Employment Application — Kansas City, MO</p>
-            </div>
-          </div>
+      <header className="border-b border-gray-300 bg-white">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <h1 className="text-xl font-bold text-gray-900">Allied Refreshment Distributing</h1>
+          <p className="text-sm text-gray-500">Kansas City, MO &nbsp;|&nbsp; hiring@alliedrefreshmentdistributing.com</p>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <ProgressIndicator steps={steps} currentStep={currentStep} />
+      {/* Progress Bar */}
+      <div className="border-b border-gray-200 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6 py-3">
+          <ProgressIndicator steps={steps} currentStep={currentStep} />
+        </div>
+      </div>
 
-        <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+      <div className="max-w-4xl mx-auto px-6 py-6">
+        <div className="border border-gray-300 bg-white p-6">
           {currentStep === 0 && <PersonalInfoForm />}
           {currentStep === 1 && <AddressHistoryForm />}
           {currentStep === 2 && <EmploymentHistoryForm />}
@@ -93,12 +95,10 @@ export default function AppFormLayout() {
           {currentStep === 5 && <ReviewSubmitForm />}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
-          Allied Refreshment Distributing — Equal Opportunity Employer — All information is kept strictly confidential
+        <p className="text-center text-xs text-gray-400 mt-4 pb-4">
+          Allied Refreshment Distributing &mdash; Equal Opportunity Employer &mdash; All information is kept strictly confidential
         </p>
       </div>
     </div>
   );
 }
-
-

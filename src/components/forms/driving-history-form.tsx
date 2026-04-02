@@ -3,15 +3,12 @@
 import { useForm as useReactHookForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import { useForm } from '@/lib/form-context';
 import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 
 const accidentSchema = z.object({
   date: z.string().min(1, 'Date is required'),
@@ -59,6 +56,10 @@ const restrictionOptions = [
 
 export function DrivingHistoryForm() {
   const { formData, updateFormData, setCurrentStep } = useForm();
+  const [uploadingFront, setUploadingFront] = useState(false);
+  const [uploadingBack, setUploadingBack] = useState(false);
+  const [frontPreview, setFrontPreview] = useState<string | null>(formData.licenseImageFront || null);
+  const [backPreview, setBackPreview] = useState<string | null>(formData.licenseImageBack || null);
 
   const form = useReactHookForm<DrivingHistoryFormData>({
     resolver: zodResolver(drivingHistorySchema),
@@ -84,13 +85,32 @@ export function DrivingHistoryForm() {
     name: 'violations',
   });
 
+  const handleFileUpload = async (file: File, side: 'front' | 'back') => {
+    const setter = side === 'front' ? setUploadingFront : setUploadingBack;
+    const previewSetter = side === 'front' ? setFrontPreview : setBackPreview;
+    const fieldKey = side === 'front' ? 'licenseImageFront' : 'licenseImageBack';
+
+    setter(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const result = await res.json();
+      if (result.url) {
+        updateFormData(fieldKey, result.url);
+        previewSetter(result.url);
+      }
+    } catch {
+      // Upload failed silently
+    } finally {
+      setter(false);
+    }
+  };
+
   const onSubmit = (data: DrivingHistoryFormData) => {
-    // Update form context with driving history
     Object.keys(data).forEach(key => {
       updateFormData(key, data[key as keyof DrivingHistoryFormData]);
     });
-
-    // Move to next step
     setCurrentStep(4);
   };
 
@@ -103,129 +123,161 @@ export function DrivingHistoryForm() {
       canGoPrevious={true}
       onNext={form.handleSubmit(onSubmit)}
     >
-      <div className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-gray-700 leading-relaxed mb-6">
-            Please provide your complete driver license information and driving history for the past 3 years.
-            This information is required by federal regulations and will be verified through official records.
-          </p>
-        </motion.div>
+      <div className="space-y-6">
+        <p className="text-sm text-gray-600 mb-4">
+          Please provide your complete driver license information and driving history for the past 3 years.
+          This information is required by federal regulations and will be verified.
+        </p>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Driver License Information */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card className="p-6 border-blue-200 bg-blue-50">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Driver License Information</h3>
+            <div className="border border-gray-300 p-4">
+              <div className="bg-gray-100 -mx-4 -mt-4 mb-4 px-4 py-2 border-b border-gray-300">
+                <h3 className="text-xs font-bold text-gray-700 uppercase">Driver License Information</h3>
+              </div>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="licenseNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">
-                            License Number <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="12345678"
-                              {...field}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="licenseState"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">
-                            State Issued <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="TX"
-                              {...field}
-                              maxLength={2}
-                              style={{ textTransform: 'uppercase' }}
-                              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="licenseExpiration"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">
-                            Expiration Date <span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="date"
-                              {...field}
-                              className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="licenseNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
+                          License Number <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="12345678" {...field} className="border-gray-300 text-sm" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}
-                    name="cdlClass"
+                    name="licenseState"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-700 font-medium">CDL Class (if applicable)</FormLabel>
+                        <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
+                          State Issued <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="A, B, or C"
-                            {...field}
-                            maxLength={1}
+                            placeholder="TX" {...field}
+                            maxLength={2}
                             style={{ textTransform: 'uppercase' }}
                             onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                            className="border-gray-300 text-sm"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="licenseExpiration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
+                          Expiration Date <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} className="border-gray-300 text-sm" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </Card>
-            </motion.div>
+
+                <FormField
+                  control={form.control}
+                  name="cdlClass"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-semibold text-gray-700 uppercase">CDL Class (if applicable)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="A, B, or C" {...field}
+                          maxLength={1}
+                          style={{ textTransform: 'uppercase' }}
+                          onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                          className="border-gray-300 text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* License Photo Upload */}
+            <div className="border border-gray-300 p-4">
+              <div className="bg-gray-100 -mx-4 -mt-4 mb-4 px-4 py-2 border-b border-gray-300">
+                <h3 className="text-xs font-bold text-gray-700 uppercase">Driver&apos;s License Photo Upload</h3>
+              </div>
+              <p className="text-xs text-gray-500 mb-4">
+                Upload a clear photo of the front and back of your driver&apos;s license. Accepted formats: JPG, PNG, PDF.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Front */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
+                    License Front
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file, 'front');
+                    }}
+                    className="block w-full text-sm text-gray-600 border border-gray-300 p-2 file:mr-3 file:py-1 file:px-3 file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  />
+                  {uploadingFront && <p className="text-xs text-blue-600 mt-1">Uploading...</p>}
+                  {frontPreview && !uploadingFront && (
+                    <div className="mt-2">
+                      <img src={frontPreview} alt="License front" className="h-24 border border-gray-300 object-cover" />
+                      <p className="text-xs text-green-600 mt-1">Uploaded</p>
+                    </div>
+                  )}
+                </div>
+                {/* Back */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
+                    License Back
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file, 'back');
+                    }}
+                    className="block w-full text-sm text-gray-600 border border-gray-300 p-2 file:mr-3 file:py-1 file:px-3 file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  />
+                  {uploadingBack && <p className="text-xs text-blue-600 mt-1">Uploading...</p>}
+                  {backPreview && !uploadingBack && (
+                    <div className="mt-2">
+                      <img src={backPreview} alt="License back" className="h-24 border border-gray-300 object-cover" />
+                      <p className="text-xs text-green-600 mt-1">Uploaded</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Endorsements & Restrictions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-            >
-              {/* Endorsements */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Endorsements</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="border border-gray-300 p-4">
+                <div className="bg-gray-100 -mx-4 -mt-4 mb-4 px-4 py-2 border-b border-gray-300">
+                  <h3 className="text-xs font-bold text-gray-700 uppercase">Endorsements</h3>
+                </div>
                 <FormField
                   control={form.control}
                   name="endorsements"
@@ -237,32 +289,21 @@ export function DrivingHistoryForm() {
                             key={option.id}
                             control={form.control}
                             name="endorsements"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={option.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(option.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, option.id])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== option.id
-                                              )
-                                            )
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-sm font-normal">
-                                    {option.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
+                            render={({ field }) => (
+                              <FormItem key={option.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(option.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, option.id])
+                                        : field.onChange(field.value?.filter((v) => v !== option.id))
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="text-sm font-normal">{option.label}</FormLabel>
+                              </FormItem>
+                            )}
                           />
                         ))}
                       </div>
@@ -270,11 +311,12 @@ export function DrivingHistoryForm() {
                     </FormItem>
                   )}
                 />
-              </Card>
+              </div>
 
-              {/* Restrictions */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Restrictions</h3>
+              <div className="border border-gray-300 p-4">
+                <div className="bg-gray-100 -mx-4 -mt-4 mb-4 px-4 py-2 border-b border-gray-300">
+                  <h3 className="text-xs font-bold text-gray-700 uppercase">Restrictions</h3>
+                </div>
                 <FormField
                   control={form.control}
                   name="restrictions"
@@ -286,32 +328,21 @@ export function DrivingHistoryForm() {
                             key={option.id}
                             control={form.control}
                             name="restrictions"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={option.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(option.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, option.id])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== option.id
-                                              )
-                                            )
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-sm font-normal">
-                                    {option.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
+                            render={({ field }) => (
+                              <FormItem key={option.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(option.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, option.id])
+                                        : field.onChange(field.value?.filter((v) => v !== option.id))
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="text-sm font-normal">{option.label}</FormLabel>
+                              </FormItem>
+                            )}
                           />
                         ))}
                       </div>
@@ -319,267 +350,180 @@ export function DrivingHistoryForm() {
                     </FormItem>
                   )}
                 />
-              </Card>
-            </motion.div>
+              </div>
+            </div>
 
             {/* Accidents */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  Traffic Accidents (Past 3 Years)
-                </h3>
-                <Button
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-gray-800">Traffic Accidents (Past 3 Years)</h3>
+                <button
                   type="button"
                   onClick={() => appendAccident({ date: '', description: '', fatalities: false, injuries: false })}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-red-50 transition-colors"
+                  className="px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                 >
-                  <Plus className="w-4 h-4" />
-                  Add Accident
-                </Button>
+                  + Add Accident
+                </button>
               </div>
 
               {accidentFields.length === 0 && (
-                <Card className="p-6 text-center text-gray-500">
-                  <p>No accidents reported. Click "Add Accident" if you have any to report.</p>
-                </Card>
+                <div className="border border-gray-300 p-4 text-center text-sm text-gray-500">
+                  No accidents reported. Click &quot;Add Accident&quot; if you have any to report.
+                </div>
               )}
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {accidentFields.map((field, index) => (
-                  <motion.div
-                    key={field.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card className="p-6 relative border-red-200">
-                      <Button
-                        type="button"
-                        onClick={() => removeAccident(index)}
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-
-                      <h4 className="font-medium text-gray-700 mb-4">Accident #{index + 1}</h4>
-
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name={`accidents.${index}.date`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-700 font-medium">Date</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="date"
-                                    {...field}
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`accidents.${index}.description`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-700 font-medium">Description</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Brief description of accident"
-                                    {...field}
-                                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="flex gap-6">
-                          <FormField
-                            control={form.control}
-                            name={`accidents.${index}.fatalities`}
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-normal">
-                                  Fatalities involved
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`accidents.${index}.injuries`}
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-normal">
-                                  Injuries involved
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div key={field.id} className="border border-gray-300 p-4 relative">
+                    <button
+                      type="button"
+                      onClick={() => removeAccident(index)}
+                      className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                    <h4 className="text-xs font-bold text-gray-600 uppercase mb-3">Accident #{index + 1}</h4>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
+                          name={`accidents.${index}.date`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Date</FormLabel>
+                              <FormControl>
+                                <Input type="date" {...field} className="border-gray-300 text-sm" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`accidents.${index}.description`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Description</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Brief description" {...field} className="border-gray-300 text-sm" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                    </Card>
-                  </motion.div>
+                      <div className="flex gap-6">
+                        <FormField
+                          control={form.control}
+                          name={`accidents.${index}.fatalities`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">Fatalities involved</FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`accidents.${index}.injuries`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">Injuries involved</FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Violations */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-orange-500" />
-                  Traffic Violations (Past 3 Years)
-                </h3>
-                <Button
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-gray-800">Traffic Violations (Past 3 Years)</h3>
+                <button
                   type="button"
                   onClick={() => appendViolation({ date: '', violation: '', location: '' })}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-orange-50 transition-colors"
+                  className="px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                 >
-                  <Plus className="w-4 h-4" />
-                  Add Violation
-                </Button>
+                  + Add Violation
+                </button>
               </div>
 
               {violationFields.length === 0 && (
-                <Card className="p-6 text-center text-gray-500">
-                  <p>No violations reported. Click "Add Violation" if you have any to report.</p>
-                </Card>
+                <div className="border border-gray-300 p-4 text-center text-sm text-gray-500">
+                  No violations reported. Click &quot;Add Violation&quot; if you have any to report.
+                </div>
               )}
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {violationFields.map((field, index) => (
-                  <motion.div
-                    key={field.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card className="p-6 relative border-orange-200">
-                      <Button
-                        type="button"
-                        onClick={() => removeViolation(index)}
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-
-                      <h4 className="font-medium text-gray-700 mb-4">Violation #{index + 1}</h4>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`violations.${index}.date`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 font-medium">Date</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="date"
-                                  {...field}
-                                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`violations.${index}.violation`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 font-medium">Violation Type</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Speeding, DUI, etc."
-                                  {...field}
-                                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`violations.${index}.location`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 font-medium">Location</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="City, State"
-                                  {...field}
-                                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </motion.div>
+                  <div key={field.id} className="border border-gray-300 p-4 relative">
+                    <button
+                      type="button"
+                      onClick={() => removeViolation(index)}
+                      className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                    <h4 className="text-xs font-bold text-gray-600 uppercase mb-3">Violation #{index + 1}</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <FormField
+                        control={form.control}
+                        name={`violations.${index}.date`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} className="border-gray-300 text-sm" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`violations.${index}.violation`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Violation Type</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Speeding, DUI, etc." {...field} className="border-gray-300 text-sm" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`violations.${index}.location`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Location</FormLabel>
+                            <FormControl>
+                              <Input placeholder="City, State" {...field} className="border-gray-300 text-sm" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            {/* Note */}
-            <motion.div
-              className="p-4 bg-red-50 rounded-lg border border-red-200"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <p className="text-red-800 text-sm">
-                <strong>Important:</strong> You must report ALL accidents and violations, even if charges were dismissed.
-                Failure to disclose this information may result in disqualification from employment.
-              </p>
-            </motion.div>
+            <div className="p-3 bg-red-50 border border-red-200 text-sm text-red-800">
+              <strong>Important:</strong> You must report ALL accidents and violations, even if charges were dismissed.
+              Failure to disclose may result in disqualification.
+            </div>
           </form>
         </Form>
       </div>
