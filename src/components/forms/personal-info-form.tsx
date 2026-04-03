@@ -29,6 +29,7 @@ type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 export function PersonalInfoForm() {
   const { formData, updateFormData, setCurrentStep } = useForm();
   const [showTestButton, setShowTestButton] = useState(false);
+  const [certifyAccurate, setCertifyAccurate] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -138,7 +139,7 @@ export function PersonalInfoForm() {
   return (
     <FormLayout
       title="Personal Information"
-      canGoNext={isValid}
+      canGoNext={isValid && certifyAccurate}
       canGoPrevious={true}
       onNext={form.handleSubmit(onSubmit)}
     >
@@ -299,6 +300,19 @@ export function PersonalInfoForm() {
               <strong>Note:</strong> All information must be accurate and complete.
               False or misleading information may result in disqualification from employment.
             </div>
+
+            <label className="flex items-start gap-3 border border-gray-300 p-3 bg-gray-50 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={certifyAccurate}
+                onChange={e => setCertifyAccurate(e.target.checked)}
+                className="w-4 h-4 mt-0.5"
+              />
+              <span className="text-sm text-gray-700">
+                I certify that all information I provide in this application is true, complete, and accurate to the best of my knowledge.
+                I understand that any false statements may result in disqualification or termination.
+              </span>
+            </label>
           </form>
         </Form>
       </div>
