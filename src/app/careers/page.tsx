@@ -56,10 +56,15 @@ export default function CareersPage() {
       <SiteNav />
 
       {/* Hero */}
-      <section className="bg-[#1a1a1a] text-white">
-        <div className="max-w-6xl mx-auto px-6 py-16 md:py-20">
+      <section className="relative bg-[#1a1a1a] text-white overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1591768793355-74d04bb6608f?w=1600&q=80"
+          alt="Delivery fleet"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Careers at Allied Refreshment Company</h1>
-          <p className="text-gray-400 text-lg max-w-2xl">
+          <p className="text-gray-300 text-lg max-w-2xl">
             Join a growing team that values hard work, reliability, and taking care of its people. See our open positions below.
           </p>
         </div>
