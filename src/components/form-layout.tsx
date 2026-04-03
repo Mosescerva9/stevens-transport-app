@@ -74,9 +74,12 @@ export default function AppFormLayout() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-300 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <h1 className="text-xl font-bold text-gray-900">Allied Refreshment Distributing</h1>
-          <p className="text-sm text-gray-500">Kansas City, MO &nbsp;|&nbsp; hiring@alliedrefreshmentdistributing.com</p>
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
+          <img src="/logo.png" alt="Allied Refreshment Distributing" className="h-14 w-auto" />
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Allied Refreshment Distributing</h1>
+            <p className="text-sm text-gray-500">Kansas City, MO &nbsp;|&nbsp; hiring@alliedrefreshmentdistributing.com</p>
+          </div>
         </div>
       </header>
 

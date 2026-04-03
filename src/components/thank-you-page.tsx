@@ -9,9 +9,12 @@ export default function ThankYouPage() {
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-gray-300 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <h1 className="text-xl font-bold text-gray-900">Allied Refreshment Distributing</h1>
-          <p className="text-sm text-gray-500">Kansas City, MO &nbsp;|&nbsp; hiring@alliedrefreshmentdistributing.com</p>
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
+          <img src="/logo.png" alt="Allied Refreshment Distributing" className="h-14 w-auto" />
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Allied Refreshment Distributing</h1>
+            <p className="text-sm text-gray-500">Kansas City, MO &nbsp;|&nbsp; hiring@alliedrefreshmentdistributing.com</p>
+          </div>
         </div>
       </header>
 
@@ -30,6 +33,9 @@ export default function ThankYouPage() {
           )}
           <p className="text-sm text-gray-500">
             Questions? Email us at <strong>hiring@alliedrefreshmentdistributing.com</strong>
+          </p>
+          <p className="text-sm text-gray-400 mt-4">
+            You may now close this window.
           </p>
         </div>
       </div>
