@@ -15,7 +15,6 @@ export function ProgressIndicator({ steps: stepsProp, currentStep: currentStepPr
   const defaultSteps = [
     'Welcome',
     'Personal Info',
-    'Address History',
     'Employment',
     'Driving Record',
     'Additional Questions',

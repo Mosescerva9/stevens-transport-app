@@ -1,27 +1,54 @@
 "use client";
 
-import { useForm as useReactHookForm } from 'react-hook-form';
+import { useForm as useReactHookForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from '@/lib/form-context';
 import { FormLayout } from '@/components/form-layout';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useEffect, useState } from 'react';
+
+const inputClass = "w-full bg-gray-200 border-0 p-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none";
+
+const addressSchema = z.object({
+  address: z.string(),
+  city: z.string(),
+  state: z.string(),
+  zip: z.string(),
+  duration: z.string(),
+});
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   middleName: z.string().optional(),
   socialSecurity: z.string()
-    .min(9, 'Social Security Number must be 9 digits')
-    .max(11, 'Social Security Number must be 9 digits')
-    .regex(/^\d{3}-?\d{2}-?\d{4}$/, 'Invalid Social Security Number format'),
+    .min(9, 'SSN must be 9 digits')
+    .max(11, 'SSN must be 9 digits')
+    .regex(/^\d{3}-?\d{2}-?\d{4}$/, 'Invalid SSN format'),
   dateOfBirth: z.string().min(1, 'Date of birth is required'),
   phone: z.string()
     .min(10, 'Phone number must be at least 10 digits')
     .regex(/^[\d\s\-\(\)]+$/, 'Invalid phone number format'),
   email: z.string().email('Invalid email address'),
+  // Address
+  currentAddress: z.string().min(1, 'Street address is required'),
+  currentCity: z.string().min(1, 'City is required'),
+  currentState: z.string().min(2, 'State is required').max(2, 'Use 2-letter code'),
+  currentZip: z.string().min(5, 'ZIP code is required').max(10),
+  currentDuration: z.string().min(1, 'Duration is required'),
+  livedHereThreeYears: z.boolean(),
+  previousAddresses: z.array(addressSchema),
+}).refine((data) => {
+  if (data.livedHereThreeYears) return true;
+  const complete = data.previousAddresses.filter(a =>
+    a.address.trim() && a.city.trim() && a.state.trim() && a.zip.trim() && a.duration.trim()
+  );
+  return complete.length >= 1;
+}, {
+  message: "Please provide at least one previous address, or check the 3+ years box",
+  path: ["previousAddresses"]
 });
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
@@ -46,27 +73,52 @@ export function PersonalInfoForm() {
       dateOfBirth: formData.dateOfBirth,
       phone: formData.phone,
       email: formData.email,
+      currentAddress: formData.currentAddress,
+      currentCity: formData.currentCity,
+      currentState: formData.currentState,
+      currentZip: formData.currentZip,
+      currentDuration: formData.currentDuration,
+      livedHereThreeYears: formData.livedHereThreeYears || false,
+      previousAddresses: formData.previousAddresses.length > 0 ? formData.previousAddresses : [
+        { address: '', city: '', state: '', zip: '', duration: '' }
+      ],
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'previousAddresses',
+  });
+
+  const livedHereThreeYears = form.watch('livedHereThreeYears');
+
   const onSubmit = (data: PersonalInfoFormData) => {
-    Object.keys(data).forEach(key => {
-      updateFormData(key, data[key as keyof PersonalInfoFormData]);
-    });
+    const completeAddresses = data.livedHereThreeYears ? [] : data.previousAddresses.filter(a =>
+      a.address.trim() && a.city.trim() && a.state.trim() && a.zip.trim() && a.duration.trim()
+    );
+    // Save all fields
+    updateFormData('firstName', data.firstName);
+    updateFormData('lastName', data.lastName);
+    updateFormData('middleName', data.middleName);
+    updateFormData('socialSecurity', data.socialSecurity);
+    updateFormData('dateOfBirth', data.dateOfBirth);
+    updateFormData('phone', data.phone);
+    updateFormData('email', data.email);
+    updateFormData('currentAddress', data.currentAddress);
+    updateFormData('currentCity', data.currentCity);
+    updateFormData('currentState', data.currentState);
+    updateFormData('currentZip', data.currentZip);
+    updateFormData('currentDuration', data.currentDuration);
+    updateFormData('livedHereThreeYears', data.livedHereThreeYears);
+    updateFormData('previousAddresses', completeAddresses);
     setCurrentStep(2);
   };
 
   const fillTestData = () => {
     const today = new Date().toISOString().split('T')[0];
-
-    // Auto-check the certification checkbox for test mode
     setCertifyAccurate(true);
-
-    // Use placeholder images for license (Cloudinary may not be configured)
     updateFormData('licenseImageFront', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+FRONT');
     updateFormData('licenseImageBack', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+BACK');
-
-    // Fill personal info form fields
     form.setValue('firstName', 'John', { shouldValidate: true });
     form.setValue('middleName', 'A', { shouldValidate: true });
     form.setValue('lastName', 'Smith', { shouldValidate: true });
@@ -74,18 +126,12 @@ export function PersonalInfoForm() {
     form.setValue('dateOfBirth', '1995-06-15', { shouldValidate: true });
     form.setValue('phone', '(555) 123-4567', { shouldValidate: true });
     form.setValue('email', 'testdriver@gmail.com', { shouldValidate: true });
-
-    // Fill ALL other steps via updateFormData so they're pre-populated
-    // Address History (Step 1)
-    updateFormData('currentAddress', '123 Main St');
-    updateFormData('currentCity', 'Kansas City');
-    updateFormData('currentState', 'KS');
-    updateFormData('currentZip', '66101');
-    updateFormData('currentDuration', '4 years');
-    updateFormData('livedHereThreeYears', true);
-    updateFormData('previousAddresses', []);
-
-    // Employment (Step 2)
+    form.setValue('currentAddress', '123 Main St', { shouldValidate: true });
+    form.setValue('currentCity', 'Kansas City', { shouldValidate: true });
+    form.setValue('currentState', 'KS', { shouldValidate: true });
+    form.setValue('currentZip', '66101', { shouldValidate: true });
+    form.setValue('currentDuration', '4 years', { shouldValidate: true });
+    form.setValue('livedHereThreeYears', true, { shouldValidate: true });
     updateFormData('currentEmployer', 'ABC Trucking');
     updateFormData('currentPosition', 'Driver');
     updateFormData('currentStartDate', '2020-01-01');
@@ -94,8 +140,6 @@ export function PersonalInfoForm() {
     updateFormData('currentReasonForLeaving', '');
     updateFormData('previousEmployment', []);
     updateFormData('militaryService', false);
-
-    // Driving History (Step 3)
     updateFormData('licenseNumber', 'K12345678');
     updateFormData('licenseState', 'KS');
     updateFormData('licenseExpiration', '2028-01-01');
@@ -104,8 +148,6 @@ export function PersonalInfoForm() {
     updateFormData('restrictions', []);
     updateFormData('accidents', []);
     updateFormData('violations', []);
-
-    // Additional Questions (Step 4)
     updateFormData('hasConvictions', false);
     updateFormData('convictionsDetails', '');
     updateFormData('canLiftFiftyLbs', true);
@@ -117,8 +159,6 @@ export function PersonalInfoForm() {
     updateFormData('emergencyContactName', 'Jane Smith');
     updateFormData('emergencyContactPhone', '555-987-6543');
     updateFormData('emergencyContactRelation', 'Spouse');
-
-    // Signature (Step 4)
     updateFormData('signature', 'John A Smith');
     updateFormData('signatureDate', today);
   };
@@ -126,17 +166,17 @@ export function PersonalInfoForm() {
   const isValid = form.formState.isValid;
 
   const formatSSN = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    if (numericValue.length <= 3) return numericValue;
-    if (numericValue.length <= 5) return `${numericValue.slice(0, 3)}-${numericValue.slice(3)}`;
-    return `${numericValue.slice(0, 3)}-${numericValue.slice(3, 5)}-${numericValue.slice(5, 9)}`;
+    const n = value.replace(/\D/g, '');
+    if (n.length <= 3) return n;
+    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5, 9)}`;
   };
 
   const formatPhone = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    if (numericValue.length <= 3) return numericValue;
-    if (numericValue.length <= 6) return `(${numericValue.slice(0, 3)}) ${numericValue.slice(3)}`;
-    return `(${numericValue.slice(0, 3)}) ${numericValue.slice(3, 6)}-${numericValue.slice(6, 10)}`;
+    const n = value.replace(/\D/g, '');
+    if (n.length <= 3) return n;
+    if (n.length <= 6) return `(${n.slice(0, 3)}) ${n.slice(3)}`;
+    return `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6, 10)}`;
   };
 
   return (
@@ -146,171 +186,209 @@ export function PersonalInfoForm() {
       canGoPrevious={true}
       onNext={form.handleSubmit(onSubmit)}
     >
-      <div className="space-y-6">
+      <div className="space-y-2">
         {showTestButton && (
-          <button
-            type="button"
-            onClick={fillTestData}
-            className="px-3 py-1 text-xs font-medium border border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded"
+          <button type="button" onClick={fillTestData}
+            className="px-3 py-1 text-xs font-medium border border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded mb-2"
           >
             Fill Test Data
           </button>
         )}
 
-        <p className="text-sm text-gray-600 mb-4">
-          Please provide your personal information exactly as it appears on your driver&apos;s license
-          and Social Security card. This information will be used to verify your identity and
-          conduct background checks as required by federal regulations.
-        </p>
-
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      First Name <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="John" {...field} className="border-gray-300 text-sm" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(onSubmit)}>
 
-              <FormField
-                control={form.control}
-                name="middleName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">Middle Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Michael" {...field} className="border-gray-300 text-sm" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      Last Name <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Smith" {...field} className="border-gray-300 text-sm" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* ── Personal Information ── */}
+            <h3 className="text-base font-bold text-gray-900 mb-1 pb-1 border-b border-gray-300">Personal Information</h3>
+            <div className="space-y-3 mb-8 mt-3">
+              <FormField control={form.control} name="firstName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">First Name <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="middleName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Middle Name</FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="lastName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Last Name <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="socialSecurity" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">SSN / SIN <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <input {...field} maxLength={11} className={inputClass}
+                      onChange={(e) => field.onChange(formatSSN(e.target.value))} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="dateOfBirth" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Date of Birth <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input type="date" {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="socialSecurity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      Social Security Number <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="123-45-6789"
-                        {...field}
-                        onChange={(e) => {
-                          const formatted = formatSSN(e.target.value);
-                          field.onChange(formatted);
-                        }}
-                        maxLength={11}
-                        className="border-gray-300 text-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* ── Address ── */}
+            <h3 className="text-base font-bold text-gray-900 mb-1 pb-1 border-b border-gray-300">Address</h3>
+            <div className="space-y-3 mb-8 mt-3">
+              <FormField control={form.control} name="currentAddress" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Current Street Address <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="currentCity" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">City <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="currentState" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">State/Province <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <input {...field} maxLength={2} style={{ textTransform: 'uppercase' }}
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())} className={inputClass} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="currentZip" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Zip/Postal Code <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="currentDuration" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">How long at this address? <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input {...field} placeholder="e.g. 2 years 6 months" className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-              <FormField
-                control={form.control}
-                name="dateOfBirth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      Date of Birth <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} className="border-gray-300 text-sm" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormField control={form.control} name="livedHereThreeYears" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Residence address for 3 or more years? <span className="text-red-500">*</span></FormLabel>
+                  <div className="flex gap-4 mt-1">
+                    <button type="button"
+                      onClick={() => field.onChange(true)}
+                      className={`px-6 py-1.5 text-sm border ${field.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                    >Yes</button>
+                    <button type="button"
+                      onClick={() => field.onChange(false)}
+                      className={`px-6 py-1.5 text-sm border ${field.value === false ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+                    >No</button>
+                  </div>
+                </FormItem>
+              )} />
+
+              {/* Previous Addresses */}
+              {!livedHereThreeYears && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-bold text-gray-800">Previous Addresses (Past 3 Years)</p>
+                    <button type="button"
+                      onClick={() => append({ address: '', city: '', state: '', zip: '', duration: '' })}
+                      className="px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
+                    >+ Add Address</button>
+                  </div>
+
+                  {form.formState.errors.previousAddresses?.message && (
+                    <div className="mb-2 p-2 bg-red-50 border border-red-200 text-red-700 text-sm">
+                      {form.formState.errors.previousAddresses.message}
+                    </div>
+                  )}
+
+                  {fields.map((f, index) => (
+                    <div key={f.id} className="border border-gray-300 p-4 mb-3 relative">
+                      {fields.length > 1 && (
+                        <button type="button" onClick={() => remove(index)}
+                          className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-700">Remove</button>
+                      )}
+                      <p className="text-xs font-bold text-gray-600 uppercase mb-2">Previous Address #{index + 1}</p>
+                      <div className="space-y-2">
+                        <FormField control={form.control} name={`previousAddresses.${index}.address`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm text-gray-700">Street Address</FormLabel>
+                            <FormControl><input {...field} className={inputClass} /></FormControl>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name={`previousAddresses.${index}.city`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm text-gray-700">City</FormLabel>
+                            <FormControl><input {...field} className={inputClass} /></FormControl>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name={`previousAddresses.${index}.state`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm text-gray-700">State</FormLabel>
+                            <FormControl><input {...field} maxLength={2} style={{ textTransform: 'uppercase' }}
+                              onChange={(e) => field.onChange(e.target.value.toUpperCase())} className={inputClass} /></FormControl>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name={`previousAddresses.${index}.zip`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm text-gray-700">ZIP Code</FormLabel>
+                            <FormControl><input {...field} className={inputClass} /></FormControl>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name={`previousAddresses.${index}.duration`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm text-gray-700">Duration</FormLabel>
+                            <FormControl><input {...field} placeholder="e.g. 6 months" className={inputClass} /></FormControl>
+                          </FormItem>
+                        )} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      Phone Number <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="(555) 123-4567"
-                        {...field}
-                        onChange={(e) => {
-                          const formatted = formatPhone(e.target.value);
-                          field.onChange(formatted);
-                        }}
-                        maxLength={14}
-                        className="border-gray-300 text-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-gray-700 uppercase">
-                      Email Address <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="john.smith@email.com" {...field} className="border-gray-300 text-sm" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* ── Contact ── */}
+            <h3 className="text-base font-bold text-gray-900 mb-1 pb-1 border-b border-gray-300">Contact</h3>
+            <p className="text-sm italic text-gray-500 mt-2 mb-3">If your cell phone is also your primary phone, enter it in both fields below.</p>
+            <div className="space-y-3 mb-6">
+              <FormField control={form.control} name="phone" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Primary Phone <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <input {...field} maxLength={14} className={inputClass}
+                      onChange={(e) => field.onChange(formatPhone(e.target.value))} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="email" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm text-gray-700">Email Address <span className="text-red-500">*</span></FormLabel>
+                  <FormControl><input type="email" {...field} className={inputClass} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
             </div>
 
-            <div className="p-3 bg-blue-50 border border-blue-200 text-sm text-blue-800">
-              <strong>Note:</strong> All information must be accurate and complete.
-              False or misleading information may result in disqualification from employment.
-            </div>
-
+            {/* Certification */}
             <label className="flex items-start gap-3 border border-gray-300 p-3 bg-gray-50 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={certifyAccurate}
-                onChange={e => setCertifyAccurate(e.target.checked)}
-                className="w-4 h-4 mt-0.5"
-              />
+              <input type="checkbox" checked={certifyAccurate}
+                onChange={e => setCertifyAccurate(e.target.checked)} className="w-4 h-4 mt-0.5" />
               <span className="text-sm text-gray-700">
                 I certify that all information I provide in this application is true, complete, and accurate to the best of my knowledge.
                 I understand that any false statements may result in disqualification or termination.

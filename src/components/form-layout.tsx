@@ -4,7 +4,6 @@ import { useFormContext } from '@/lib/form-context';
 import { ProgressIndicator } from './progress-indicator';
 import WelcomeForm from './forms/welcome-form';
 import { PersonalInfoForm } from './forms/personal-info-form';
-import { AddressHistoryForm } from './forms/address-history-form';
 import { DrivingHistoryForm } from './forms/driving-history-form';
 import { EmploymentHistoryForm } from './forms/employment-history-form';
 import AdditionalQuestionsForm from './forms/additional-questions-form';
@@ -15,7 +14,6 @@ import React from 'react';
 const steps = [
   'Welcome',
   'Personal Info',
-  'Address History',
   'Employment',
   'Driving History',
   'Additional Questions',
@@ -91,11 +89,10 @@ export default function AppFormLayout() {
         <div className="border border-gray-300 bg-white p-6">
           {currentStep === 0 && <WelcomeForm />}
           {currentStep === 1 && <PersonalInfoForm />}
-          {currentStep === 2 && <AddressHistoryForm />}
-          {currentStep === 3 && <EmploymentHistoryForm />}
-          {currentStep === 4 && <DrivingHistoryForm />}
-          {currentStep === 5 && <AdditionalQuestionsForm />}
-          {currentStep === 6 && <ReviewSubmitForm />}
+          {currentStep === 2 && <EmploymentHistoryForm />}
+          {currentStep === 3 && <DrivingHistoryForm />}
+          {currentStep === 4 && <AdditionalQuestionsForm />}
+          {currentStep === 5 && <ReviewSubmitForm />}
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4 pb-4">

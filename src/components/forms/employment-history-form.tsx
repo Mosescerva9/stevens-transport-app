@@ -78,7 +78,7 @@ export function EmploymentHistoryForm() {
     updateFormData('militaryBranch', data.militaryBranch);
     updateFormData('militaryRank', data.militaryRank);
     updateFormData('militaryDates', data.militaryDates);
-    setCurrentStep(4);
+    setCurrentStep(3);
   };
 
   return (

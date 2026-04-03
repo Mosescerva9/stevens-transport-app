@@ -119,7 +119,7 @@ const FormContext = createContext<FormContextType | null>(null);
 export function FormProvider({ children }: { children: React.ReactNode }) {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [currentStep, setCurrentStep] = useState(0);
-  const totalSteps = 7;
+  const totalSteps = 6;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateFormData = (keyOrData: string | Partial<FormData>, value?: any) => {
