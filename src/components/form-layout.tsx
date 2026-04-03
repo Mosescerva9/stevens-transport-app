@@ -2,23 +2,23 @@
 
 import { useFormContext } from '@/lib/form-context';
 import { ProgressIndicator } from './progress-indicator';
+import WelcomeForm from './forms/welcome-form';
 import { PersonalInfoForm } from './forms/personal-info-form';
 import { AddressHistoryForm } from './forms/address-history-form';
 import { DrivingHistoryForm } from './forms/driving-history-form';
 import { EmploymentHistoryForm } from './forms/employment-history-form';
 import AdditionalQuestionsForm from './forms/additional-questions-form';
 import ReviewSubmitForm from './forms/review-submit-form';
-import VerifyInfoForm from './forms/verify-info-form';
 import { Button } from './ui/button';
 import React from 'react';
 
 const steps = [
+  'Welcome',
   'Personal Info',
   'Address History',
   'Employment',
   'Driving History',
   'Additional Questions',
-  'Verify Info',
   'Review & Submit',
 ];
 
@@ -89,12 +89,12 @@ export default function AppFormLayout() {
 
       <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="border border-gray-300 bg-white p-6">
-          {currentStep === 0 && <PersonalInfoForm />}
-          {currentStep === 1 && <AddressHistoryForm />}
-          {currentStep === 2 && <EmploymentHistoryForm />}
-          {currentStep === 3 && <DrivingHistoryForm />}
-          {currentStep === 4 && <AdditionalQuestionsForm />}
-          {currentStep === 5 && <VerifyInfoForm />}
+          {currentStep === 0 && <WelcomeForm />}
+          {currentStep === 1 && <PersonalInfoForm />}
+          {currentStep === 2 && <AddressHistoryForm />}
+          {currentStep === 3 && <EmploymentHistoryForm />}
+          {currentStep === 4 && <DrivingHistoryForm />}
+          {currentStep === 5 && <AdditionalQuestionsForm />}
           {currentStep === 6 && <ReviewSubmitForm />}
         </div>
 

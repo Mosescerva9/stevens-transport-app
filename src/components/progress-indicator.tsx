@@ -13,12 +13,12 @@ export function ProgressIndicator({ steps: stepsProp, currentStep: currentStepPr
   const currentStep = currentStepProp !== undefined ? currentStepProp : ctxStep;
 
   const defaultSteps = [
+    'Welcome',
     'Personal Info',
     'Address History',
     'Employment',
     'Driving Record',
     'Additional Questions',
-    'Verify Info',
     'Review & Submit',
   ];
 

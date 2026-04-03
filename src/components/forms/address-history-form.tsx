@@ -75,7 +75,7 @@ export function AddressHistoryForm() {
     updateFormData('currentDuration', data.currentDuration);
     updateFormData('livedHereThreeYears', data.livedHereThreeYears);
     updateFormData('previousAddresses', completeAddresses);
-    setCurrentStep(2);
+    setCurrentStep(3);
   };
 
   const isValid = form.formState.isValid;

@@ -53,7 +53,7 @@ export function PersonalInfoForm() {
     Object.keys(data).forEach(key => {
       updateFormData(key, data[key as keyof PersonalInfoFormData]);
     });
-    setCurrentStep(1);
+    setCurrentStep(2);
   };
 
   const fillTestData = () => {

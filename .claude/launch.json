@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "/Users/chicken/Downloads/stevens-transport-app/.claude/start-dev.sh",
-      "runtimeArgs": [],
+      "runtimeExecutable": "/bin/echo",
+      "runtimeArgs": ["server already running"],
       "port": 3001
     }
   ]
