@@ -12,6 +12,10 @@ export default function VerifyInfoForm() {
   const [dob, setDob] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [zip, setZip] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [verified, setVerified] = useState(false);
 
@@ -51,6 +55,18 @@ export default function VerifyInfoForm() {
     }
     if (email.trim().toLowerCase() !== formData.email.trim().toLowerCase()) {
       newErrors.email = 'Email does not match what you entered earlier';
+    }
+    if (address.trim().toLowerCase() !== formData.currentAddress.trim().toLowerCase()) {
+      newErrors.address = 'Street address does not match what you entered earlier';
+    }
+    if (city.trim().toLowerCase() !== formData.currentCity.trim().toLowerCase()) {
+      newErrors.city = 'City does not match what you entered earlier';
+    }
+    if (state.trim().toUpperCase() !== formData.currentState.trim().toUpperCase()) {
+      newErrors.state = 'State does not match what you entered earlier';
+    }
+    if (zip.trim() !== formData.currentZip.trim()) {
+      newErrors.zip = 'ZIP code does not match what you entered earlier';
     }
 
     setErrors(newErrors);
@@ -169,6 +185,65 @@ export default function VerifyInfoForm() {
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
         </div>
+
+        {/* Home Address */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+            Street Address <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={address}
+            onChange={e => { setAddress(e.target.value); setVerified(false); }}
+            placeholder="Re-enter your street address"
+            className={`w-full border p-2 text-sm ${errors.address ? 'border-red-400' : 'border-gray-300'}`}
+          />
+          {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+              City <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={city}
+              onChange={e => { setCity(e.target.value); setVerified(false); }}
+              placeholder="Re-enter city"
+              className={`w-full border p-2 text-sm ${errors.city ? 'border-red-400' : 'border-gray-300'}`}
+            />
+            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+              State <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={state}
+              onChange={e => { setState(e.target.value.toUpperCase()); setVerified(false); }}
+              placeholder="ST"
+              maxLength={2}
+              style={{ textTransform: 'uppercase' }}
+              className={`w-full border p-2 text-sm ${errors.state ? 'border-red-400' : 'border-gray-300'}`}
+            />
+            {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+              ZIP Code <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={zip}
+              onChange={e => { setZip(e.target.value); setVerified(false); }}
+              placeholder="Re-enter ZIP"
+              className={`w-full border p-2 text-sm ${errors.zip ? 'border-red-400' : 'border-gray-300'}`}
+            />
+            {errors.zip && <p className="text-red-500 text-xs mt-1">{errors.zip}</p>}
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
@@ -183,7 +258,7 @@ export default function VerifyInfoForm() {
           <button
             type="button"
             onClick={handleVerify}
-            disabled={!firstName || !lastName || !ssn || !dob || !phone || !email}
+            disabled={!firstName || !lastName || !ssn || !dob || !phone || !email || !address || !city || !state || !zip}
             className="px-6 py-2 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Verify Information
