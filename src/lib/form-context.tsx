@@ -59,6 +59,15 @@ export interface FormData {
     date: string; violation: string; location: string; penalty?: string;
   }>;
 
+  // Education
+  education: Array<{
+    school: string;
+    location: string;
+    yearsCompleted: string;
+    graduated: boolean;
+    degree: string;
+  }>;
+
   // General Information
   eligibleForEmployment: boolean;
   speaksEnglish: boolean;
@@ -109,6 +118,7 @@ const defaultFormData: FormData = {
   currentEmployer: '', currentPosition: '', currentStartDate: '', currentSalary: '',
   canContactCurrentEmployer: true, previousEmployment: [],
   accidents: [], violations: [],
+  education: [],
   eligibleForEmployment: false, speaksEnglish: false, workedForCompanyBefore: false,
   knownByOtherName: false, attendingTruckSchool: false, failedDrugTest: false,
   mvrViolationsCount: '', hadAccidents3Years: false, mvrSuspensionsLength: '',

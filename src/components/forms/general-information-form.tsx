@@ -61,6 +61,26 @@ export function GeneralInformationForm() {
   );
   const [mvrSuspensionsLength, setMvrSuspensionsLength] = useState(formData.mvrSuspensionsLength || '');
 
+  const [education, setEducation] = useState(
+    formData.education && formData.education.length > 0
+      ? formData.education
+      : [{ school: '', location: '', yearsCompleted: '', graduated: false, degree: '' }]
+  );
+
+  const addEducation = () => {
+    setEducation([...education, { school: '', location: '', yearsCompleted: '', graduated: false, degree: '' }]);
+  };
+
+  const removeEducation = (index: number) => {
+    setEducation(education.filter((_, i) => i !== index));
+  };
+
+  const updateEducation = (index: number, field: string, value: string | boolean) => {
+    const updated = [...education];
+    updated[index] = { ...updated[index], [field]: value };
+    setEducation(updated);
+  };
+
   const [errors, setErrors] = useState<string[]>([]);
 
   const validate = () => {
@@ -80,6 +100,7 @@ export function GeneralInformationForm() {
 
   const handleNext = () => {
     if (!validate()) return;
+    const completeEducation = education.filter(e => e.school.trim());
     updateFormData({
       eligibleForEmployment: eligibleForEmployment!,
       speaksEnglish: speaksEnglish!,
@@ -92,6 +113,7 @@ export function GeneralInformationForm() {
       mvrViolationsCount,
       hadAccidents3Years: hadAccidents3Years!,
       mvrSuspensionsLength,
+      education: completeEducation,
     });
     setCurrentStep(3);
   };
@@ -214,6 +236,86 @@ export function GeneralInformationForm() {
             <option value="90+ days">90+ days</option>
           </select>
         </div>
+      </div>
+
+      {/* Education */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-gray-900 pb-1 border-b border-gray-300 flex-1">Education</h3>
+          <button
+            type="button"
+            onClick={addEducation}
+            className="ml-4 px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            + Add School
+          </button>
+        </div>
+
+        {education.map((edu, index) => (
+          <div key={index} className="border border-gray-300 p-4 mb-3 relative">
+            {education.length > 1 && (
+              <button type="button" onClick={() => removeEducation(index)}
+                className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-700">Remove</button>
+            )}
+            <p className="text-xs font-bold text-gray-600 uppercase mb-3">School #{index + 1}</p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-700">School Name</label>
+                <input
+                  value={edu.school}
+                  onChange={e => updateEducation(index, 'school', e.target.value)}
+                  placeholder="School or institution name"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-700">Location (City, State)</label>
+                <input
+                  value={edu.location}
+                  onChange={e => updateEducation(index, 'location', e.target.value)}
+                  placeholder="Kansas City, MO"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-700">Years Completed</label>
+                <select
+                  value={edu.yearsCompleted}
+                  onChange={e => updateEducation(index, 'yearsCompleted', e.target.value)}
+                  className={selectClass}
+                >
+                  <option value="">-- Select --</option>
+                  <option value="Less than 1 year">Less than 1 year</option>
+                  <option value="1 year">1 year</option>
+                  <option value="2 years">2 years</option>
+                  <option value="3 years">3 years</option>
+                  <option value="4 years">4 years</option>
+                  <option value="5+ years">5+ years</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={edu.graduated}
+                    onChange={e => updateEducation(index, 'graduated', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm text-gray-700">Graduated / Completed</span>
+                </label>
+              </div>
+              <div>
+                <label className="text-sm text-gray-700">Degree / Certificate (if any)</label>
+                <input
+                  value={edu.degree}
+                  onChange={e => updateEducation(index, 'degree', e.target.value)}
+                  placeholder="e.g. High School Diploma, CDL Certificate, Associate's"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Navigation */}
