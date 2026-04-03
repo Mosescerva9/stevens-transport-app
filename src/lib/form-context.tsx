@@ -59,6 +59,18 @@ export interface FormData {
     date: string; violation: string; location: string; penalty?: string;
   }>;
 
+  // General Information
+  eligibleForEmployment: boolean;
+  speaksEnglish: boolean;
+  workedForCompanyBefore: boolean;
+  knownByOtherName: boolean;
+  otherName?: string;
+  attendingTruckSchool: boolean;
+  failedDrugTest: boolean;
+  mvrViolationsCount: string;
+  hadAccidents3Years: boolean;
+  mvrSuspensionsLength: string;
+
   // Military
   militaryService: boolean;
   militaryBranch?: string;
@@ -82,6 +94,7 @@ export interface FormData {
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   emergencyContactRelation?: string;
+  smsConsent: boolean;
   signature?: string;
   signatureDate?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,7 +109,11 @@ const defaultFormData: FormData = {
   currentEmployer: '', currentPosition: '', currentStartDate: '', currentSalary: '',
   canContactCurrentEmployer: true, previousEmployment: [],
   accidents: [], violations: [],
+  eligibleForEmployment: false, speaksEnglish: false, workedForCompanyBefore: false,
+  knownByOtherName: false, attendingTruckSchool: false, failedDrugTest: false,
+  mvrViolationsCount: '', hadAccidents3Years: false, mvrSuspensionsLength: '',
   militaryService: false,
+  smsConsent: false,
   hasConvictions: false, hasBeenBonded: false, canLiftFiftyLbs: false,
   hasPhysicalLimits: false, availableWeekends: false, availableOvernight: false,
 };
@@ -119,7 +136,7 @@ const FormContext = createContext<FormContextType | null>(null);
 export function FormProvider({ children }: { children: React.ReactNode }) {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [currentStep, setCurrentStep] = useState(0);
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateFormData = (keyOrData: string | Partial<FormData>, value?: any) => {

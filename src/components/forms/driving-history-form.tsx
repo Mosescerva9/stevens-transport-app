@@ -140,7 +140,7 @@ export function DrivingHistoryForm() {
     Object.keys(data).forEach(key => {
       updateFormData(key, data[key as keyof DrivingHistoryFormData]);
     });
-    setCurrentStep(4);
+    setCurrentStep(5);
   };
 
   const isValid = form.formState.isValid;

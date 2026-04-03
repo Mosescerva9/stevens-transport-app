@@ -57,6 +57,7 @@ export function PersonalInfoForm() {
   const { formData, updateFormData, setCurrentStep } = useForm();
   const [showTestButton, setShowTestButton] = useState(false);
   const [certifyAccurate, setCertifyAccurate] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(formData.smsConsent || false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -111,12 +112,14 @@ export function PersonalInfoForm() {
     updateFormData('currentDuration', data.currentDuration);
     updateFormData('livedHereThreeYears', data.livedHereThreeYears);
     updateFormData('previousAddresses', completeAddresses);
+    updateFormData('smsConsent', smsConsent);
     setCurrentStep(2);
   };
 
   const fillTestData = () => {
     const today = new Date().toISOString().split('T')[0];
     setCertifyAccurate(true);
+    setSmsConsent(true);
     updateFormData('licenseImageFront', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+FRONT');
     updateFormData('licenseImageBack', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+BACK');
     form.setValue('firstName', 'John', { shouldValidate: true });
@@ -392,6 +395,16 @@ export function PersonalInfoForm() {
               <span className="text-sm text-gray-700">
                 I certify that all information I provide in this application is true, complete, and accurate to the best of my knowledge.
                 I understand that any false statements may result in disqualification or termination.
+              </span>
+            </label>
+
+            {/* SMS Consent */}
+            <label className="flex items-start gap-3 border border-gray-300 p-3 bg-gray-50 cursor-pointer mt-3">
+              <input type="checkbox" checked={smsConsent}
+                onChange={e => setSmsConsent(e.target.checked)} className="w-4 h-4 mt-0.5" />
+              <span className="text-sm text-gray-700">
+                I agree to receive text messages from Allied Refreshment Distributing regarding my application and employment opportunities.
+                Message and data rates may apply. You can opt out at any time by replying STOP.
               </span>
             </label>
           </form>
