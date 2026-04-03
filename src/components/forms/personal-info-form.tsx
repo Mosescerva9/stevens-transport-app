@@ -59,6 +59,9 @@ export function PersonalInfoForm() {
   const fillTestData = () => {
     const today = new Date().toISOString().split('T')[0];
 
+    // Auto-check the certification checkbox for test mode
+    setCertifyAccurate(true);
+
     // Use placeholder images for license (Cloudinary may not be configured)
     updateFormData('licenseImageFront', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+FRONT');
     updateFormData('licenseImageBack', 'https://placehold.co/400x250/e2e8f0/333333?text=TEST+LICENSE+BACK');
