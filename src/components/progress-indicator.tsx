@@ -18,6 +18,7 @@ export function ProgressIndicator({ steps: stepsProp, currentStep: currentStepPr
     'Employment',
     'Driving Record',
     'Additional Questions',
+    'Verify Info',
     'Review & Submit',
   ];
 

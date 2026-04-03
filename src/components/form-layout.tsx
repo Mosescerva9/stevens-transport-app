@@ -8,6 +8,7 @@ import { DrivingHistoryForm } from './forms/driving-history-form';
 import { EmploymentHistoryForm } from './forms/employment-history-form';
 import AdditionalQuestionsForm from './forms/additional-questions-form';
 import ReviewSubmitForm from './forms/review-submit-form';
+import VerifyInfoForm from './forms/verify-info-form';
 import { Button } from './ui/button';
 import React from 'react';
 
@@ -17,6 +18,7 @@ const steps = [
   'Employment',
   'Driving History',
   'Additional Questions',
+  'Verify Info',
   'Review & Submit',
 ];
 
@@ -92,7 +94,8 @@ export default function AppFormLayout() {
           {currentStep === 2 && <EmploymentHistoryForm />}
           {currentStep === 3 && <DrivingHistoryForm />}
           {currentStep === 4 && <AdditionalQuestionsForm />}
-          {currentStep === 5 && <ReviewSubmitForm />}
+          {currentStep === 5 && <VerifyInfoForm />}
+          {currentStep === 6 && <ReviewSubmitForm />}
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4 pb-4">
