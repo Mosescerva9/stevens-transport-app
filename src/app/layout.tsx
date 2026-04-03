@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Allied Refreshment Distributing — Driver Application",
-  description: "Apply to become a delivery driver at Allied Refreshment Distributing in Kansas City, MO.",
+  title: "Allied Refreshment Company — Kansas City, MO",
+  description: "Allied Refreshment Company is a beverage distribution company serving the Kansas City metro area. Now hiring delivery drivers.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
