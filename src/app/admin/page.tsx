@@ -231,13 +231,18 @@ export default function AdminDashboard() {
                       <button
                         onClick={async () => {
                           try {
-                            const res = await fetch(`/api/applications/${app.id}`);
-                            const result = await res.json();
-                            if (result.success) {
-                              setSelectedApp(result.data);
-                            } else {
-                              setSelectedApp(app);
+                            const [appRes, imgRes] = await Promise.all([
+                              fetch(`/api/applications/${app.id}`),
+                              fetch(`/api/applications/${app.id}/images`),
+                            ]);
+                            const appResult = await appRes.json();
+                            const imgResult = await imgRes.json();
+                            const fullApp = appResult.success ? appResult.data : app;
+                            if (imgResult.success) {
+                              fullApp.licenseImageFront = imgResult.data.licenseImageFront;
+                              fullApp.licenseImageBack = imgResult.data.licenseImageBack;
                             }
+                            setSelectedApp(fullApp);
                           } catch {
                             setSelectedApp(app);
                           }
