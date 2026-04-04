@@ -229,7 +229,19 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => setSelectedApp(app)}
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`/api/applications/${app.id}`);
+                            const result = await res.json();
+                            if (result.success) {
+                              setSelectedApp(result.data);
+                            } else {
+                              setSelectedApp(app);
+                            }
+                          } catch {
+                            setSelectedApp(app);
+                          }
+                        }}
                         className="px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                       >
                         View

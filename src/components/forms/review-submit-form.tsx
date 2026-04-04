@@ -14,13 +14,32 @@ export default function ReviewSubmitForm() {
     setSubmitting(true);
     setError('');
     try {
+      // Strip large base64 image data from main submission to stay under Vercel's 4.5MB body limit
+      const { licenseImageFront, licenseImageBack, ...formDataWithoutImages } = formData;
+
       const res = await fetch('/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataWithoutImages),
       });
       const result = await res.json();
       if (result.success) {
+        // Send images separately if they exist
+        if (licenseImageFront || licenseImageBack) {
+          try {
+            await fetch(`/api/applications/${result.data.id}/images`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                licenseImageFront: licenseImageFront || '',
+                licenseImageBack: licenseImageBack || '',
+              }),
+            });
+          } catch {
+            // Images failed but application was saved — don't block the user
+            console.warn('License images could not be uploaded, but application was saved.');
+          }
+        }
         router.push(`/thank-you?ref=${result.data.referenceNumber}`);
       } else {
         setError(result.error || 'Submission failed. Please try again.');
