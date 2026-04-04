@@ -92,6 +92,41 @@ export function DrivingHistoryForm() {
     name: 'violations',
   });
 
+  // Compress image on client side to stay under Vercel's 4.5MB payload limits
+  const compressImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 900;
+        let { width, height } = img;
+
+        if (width > MAX_WIDTH) {
+          height = (height * MAX_WIDTH) / width;
+          width = MAX_WIDTH;
+        }
+        if (height > MAX_HEIGHT) {
+          width = (width * MAX_HEIGHT) / height;
+          height = MAX_HEIGHT;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('No canvas context')); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => blob ? resolve(blob) : reject(new Error('Compression failed')),
+          'image/jpeg',
+          0.7
+        );
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleFileUpload = async (file: File, side: 'front' | 'back') => {
     const setter = side === 'front' ? setUploadingFront : setUploadingBack;
     const previewSetter = side === 'front' ? setFrontPreview : setBackPreview;
@@ -102,8 +137,12 @@ export function DrivingHistoryForm() {
 
     setter(true);
     try {
+      // Compress before uploading
+      const compressed = await compressImage(file);
+      const compressedFile = new File([compressed], file.name, { type: 'image/jpeg' });
+
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressedFile);
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
       const result = await res.json();
       if (result.url) {

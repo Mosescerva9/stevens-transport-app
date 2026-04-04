@@ -241,9 +241,6 @@ export async function GET(request: NextRequest) {
       data: {
         applications: applications.map(app => ({
           ...app,
-          // Exclude large base64 image data from list response to avoid 413 errors
-          licenseImageFront: app.licenseImageFront ? 'uploaded' : null,
-          licenseImageBack: app.licenseImageBack ? 'uploaded' : null,
           endorsements: app.endorsements ? JSON.parse(app.endorsements) : [],
           restrictions: app.restrictions ? JSON.parse(app.restrictions) : [],
         })),

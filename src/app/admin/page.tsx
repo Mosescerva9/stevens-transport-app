@@ -229,23 +229,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={async () => {
-                          try {
-                            const appRes = await fetch(`/api/applications/${app.id}`);
-                            const appResult = await appRes.json();
-                            const fullApp = appResult.success ? appResult.data : app;
-                            // Set image URLs to direct binary endpoints (avoids 413 JSON payload limits)
-                            if (fullApp.licenseImageFront === 'uploaded') {
-                              fullApp.licenseImageFront = `/api/applications/${app.id}/images?side=front`;
-                            }
-                            if (fullApp.licenseImageBack === 'uploaded') {
-                              fullApp.licenseImageBack = `/api/applications/${app.id}/images?side=back`;
-                            }
-                            setSelectedApp(fullApp);
-                          } catch {
-                            setSelectedApp(app);
-                          }
-                        }}
+                        onClick={() => setSelectedApp(app)}
                         className="px-3 py-1 text-xs font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                       >
                         View
