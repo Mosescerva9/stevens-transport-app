@@ -231,16 +231,15 @@ export default function AdminDashboard() {
                       <button
                         onClick={async () => {
                           try {
-                            const [appRes, imgRes] = await Promise.all([
-                              fetch(`/api/applications/${app.id}`),
-                              fetch(`/api/applications/${app.id}/images`),
-                            ]);
+                            const appRes = await fetch(`/api/applications/${app.id}`);
                             const appResult = await appRes.json();
-                            const imgResult = await imgRes.json();
                             const fullApp = appResult.success ? appResult.data : app;
-                            if (imgResult.success) {
-                              fullApp.licenseImageFront = imgResult.data.licenseImageFront;
-                              fullApp.licenseImageBack = imgResult.data.licenseImageBack;
+                            // Set image URLs to direct binary endpoints (avoids 413 JSON payload limits)
+                            if (fullApp.licenseImageFront === 'uploaded') {
+                              fullApp.licenseImageFront = `/api/applications/${app.id}/images?side=front`;
+                            }
+                            if (fullApp.licenseImageBack === 'uploaded') {
+                              fullApp.licenseImageBack = `/api/applications/${app.id}/images?side=back`;
                             }
                             setSelectedApp(fullApp);
                           } catch {
