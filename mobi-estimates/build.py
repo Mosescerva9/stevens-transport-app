@@ -12,7 +12,7 @@ SITE_NAME = "Mobi Estimates"
 PHONE = "(800) 555-0142"
 PHONE_HREF = "+18005550142"
 EMAIL = "estimates@mobiestimates.com"
-ASSET_VER = "4"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "5"  # bump to bust browser cache when CSS/JS change
 
 # --------------------------------------------------------------------------
 # Icons (Heroicons-style, 24x24 outline). Stored as inner markup.
@@ -165,7 +165,7 @@ def footer():
   <div class="container">
     <div class="footer-grid">
       <div>
-        <div class="footer-logo"><img src="assets/img/mobi-logo.png" alt="%s"></div>
+        <img src="assets/img/mobi-logo-white.png" alt="%s" style="height:36px;margin-bottom:18px">
         <p style="color:#9fb1cc;max-width:34ch;font-size:.94rem;line-height:1.7">
           Your estimating department, on demand. Remote construction estimating and quantity takeoffs for contractors across the United States.</p>
         <div style="margin-top:18px;display:grid;gap:8px;font-size:.92rem">
