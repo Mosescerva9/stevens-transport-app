@@ -4,26 +4,26 @@
    ========================================================================= */
 
 :root {
-  /* Brand */
-  --navy-950: #081427;
-  --navy-900: #0b1d3a;
-  --navy-800: #102a52;
-  --navy-700: #173a6b;
-  --brand-700: #1546b8;
-  --brand-600: #1d4ed8;
-  --brand-500: #2563eb;
-  --brand-400: #3b82f6;
-  --brand-300: #6aa3f7;
+  /* Brand — Calibore-inspired steel navy + muted blue */
+  --navy-950: #0c1830;
+  --navy-900: #16243f;
+  --navy-800: #1e3157;
+  --navy-700: #2a4170;
+  --brand-700: #244c84;
+  --brand-600: #2c5c9e;
+  --brand-500: #3a6cb3;
+  --brand-400: #5e86c4;
+  --brand-300: #9db4d4;
 
   /* Neutrals */
-  --ink: #0b1b33;
-  --slate-700: #334155;
-  --slate-600: #475569;
-  --slate-500: #64748b;
-  --line: #e2e8f0;
-  --line-soft: #eef2f7;
-  --bg: #f8fafc;
-  --bg-alt: #f1f5f9;
+  --ink: #16243f;
+  --slate-700: #3a4760;
+  --slate-600: #51607a;
+  --slate-500: #6b7a93;
+  --line: #dbe3ee;
+  --line-soft: #eaeff6;
+  --bg: #fbfcff;
+  --bg-alt: #e9eff6;
   --white: #ffffff;
 
   /* Effects */
@@ -80,12 +80,11 @@ p { margin: 0; }
 
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--brand-600);
+  font-size: .8rem; font-weight: 600; letter-spacing: .01em; text-transform: none;
+  color: var(--brand-600); background: #fff; border: 1px solid var(--line);
+  border-radius: 999px; padding: 7px 16px; box-shadow: var(--shadow-sm);
 }
-.eyebrow::before { content: ""; width: 22px; height: 2px; background: var(--brand-500); border-radius: 2px; }
-.eyebrow.on-dark { color: var(--brand-300); }
-.eyebrow.on-dark::before { background: var(--brand-400); }
+.eyebrow.on-dark { color: #cfe0f5; background: rgba(255, 255, 255, .07); border-color: rgba(255, 255, 255, .18); box-shadow: none; }
 
 .lead { font-size: clamp(1.05rem, 1.5vw, 1.22rem); color: var(--slate-600); line-height: 1.7; }
 .muted { color: var(--slate-600); }
@@ -497,3 +496,62 @@ body::before {
   .reveal, .reveal-left, .reveal-scale { filter: none !important; }
   .btn-primary::after { display: none; }
 }
+
+/* =========================================================================
+   Calibore-modelled components
+   ========================================================================= */
+
+/* Cooler light surface to match the reference */
+.band-alt {
+  background:
+    radial-gradient(70% 90% at 100% 0, rgba(44, 92, 158, .06), transparent 58%),
+    radial-gradient(60% 70% at 0 100%, rgba(22, 36, 63, .05), transparent 60%),
+    linear-gradient(180deg, #f4f7fb, #e6edf5);
+}
+
+/* Numbered expertise list — the signature Calibore element */
+.num-list { border-top: 1px solid var(--line); }
+.num-item {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0 30px;
+  padding: 28px 6px; border-bottom: 1px solid var(--line); text-decoration: none;
+  position: relative; transition: background .35s var(--ease), padding-left .35s var(--ease);
+}
+.num-item:hover { background: rgba(44, 92, 158, .045); padding-left: 16px; }
+.num-item .n {
+  font-family: "Fraunces", serif; font-weight: 500; line-height: 1; color: var(--brand-500);
+  font-size: clamp(1.8rem, 3.4vw, 2.7rem); font-variant-numeric: tabular-nums; min-width: 2.4ch;
+  transition: color .3s var(--ease);
+}
+.num-item:hover .n { color: var(--brand-700); }
+.num-item .nc h3 { font-size: clamp(1.15rem, 2vw, 1.5rem); color: var(--navy-900); margin: 0 0 5px; }
+.num-item .nc p { color: var(--slate-600); font-size: .98rem; max-width: 64ch; margin: 0; }
+.num-item .ni {
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line);
+  display: grid; place-items: center; color: var(--brand-600); flex-shrink: 0;
+  transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+}
+.num-item:hover .ni { background: var(--brand-600); color: #fff; border-color: transparent; transform: translateX(5px); }
+@media (max-width: 640px) {
+  .num-item { grid-template-columns: auto 1fr; gap: 0 18px; padding: 22px 4px; }
+  .num-item .ni { display: none; }
+}
+
+/* Big stats band */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 40px; }
+.stat { padding-top: 22px; border-top: 2px solid var(--brand-400); }
+.stat .sv {
+  font-size: clamp(2.4rem, 4.8vw, 3.5rem); font-weight: 700; letter-spacing: -.035em;
+  line-height: 1; color: var(--navy-900);
+}
+.stat .sv .unit { font-size: .5em; font-weight: 600; color: var(--brand-600); margin-left: 2px; }
+.stat .sl { margin-top: 10px; color: var(--slate-600); font-size: .95rem; }
+.band-dark .stat .sv { color: #fff; }
+.band-dark .stat .sl { color: #aebfd8; }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* Serif italic display accent (the "Partner-led" move) */
+.serif-accent { font-family: "Fraunces", serif; font-style: italic; font-weight: 500; }
+
+/* Framed media inset, like the reference hero photo */
+.framed { padding: 10px; background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.framed > * { border-radius: calc(var(--radius-lg) - 10px); }

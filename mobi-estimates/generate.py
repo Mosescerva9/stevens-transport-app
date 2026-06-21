@@ -3,6 +3,27 @@
 from build import *  # noqa: F401,F403
 
 
+# Calibore-style numbered expertise list
+def numbered_item(i, href, ic, title, desc):
+    return ('<a class="num-item reveal" href="%s">'
+            '<span class="n">%02d</span>'
+            '<span class="nc"><h3>%s</h3><p>%s</p></span>'
+            '<span class="ni">%s</span></a>') % (href, i, title, desc, icon(ic))
+
+
+def numbered_list(items):
+    rows = "".join(numbered_item(i + 1, h, ic, t, d)
+                   for i, (h, ic, t, d) in enumerate(items))
+    return '<div class="num-list">%s</div>' % rows
+
+
+def stats_band(stats):
+    cells = "".join(
+        '<div class="stat reveal" data-delay="%d"><div class="sv">%s</div><div class="sl">%s</div></div>'
+        % (i * 70, v, l) for i, (v, l) in enumerate(stats))
+    return '<div class="stats">%s</div>' % cells
+
+
 # ==========================================================================
 # HOME
 # ==========================================================================
@@ -18,22 +39,19 @@ def build_home():
                      "Use Mobi Estimates for occasional overflow work, individual projects, or ongoing monthly estimating support.", 240),
     ])
 
-    services = "".join([
-        service_card(h, ic, t, d, i * 70)
-        for i, (h, ic, t, d) in enumerate([
-            ("quantity-takeoffs.html", "doc-search", "Quantity Takeoffs",
-             "Detailed measurements and quantities extracted directly from your construction drawings."),
-            ("construction-cost-estimating.html", "calculator", "Construction Cost Estimating",
-             "Labor, material, equipment and subcontractor costs prepared from plans and specifications."),
-            ("general-contractor-estimating.html", "building2", "General Contractor Estimating",
-             "Full-project, multi-trade estimates and bid-ready packages for general contractors."),
-            ("subcontractor-estimating.html", "wrench", "Subcontractor Estimating",
-             "Trade-specific takeoffs and pricing so subs can bid faster and more competitively."),
-            ("monthly-estimating-support.html", "refresh", "Monthly Estimating Support",
-             "Reserved, ongoing estimating capacity without hiring a full-time in-house estimator."),
-            ("services.html", "list-check", "Bid Preparation & Review",
-             "Bid summaries, scope breakdowns, scope-gap review, bid leveling and value engineering."),
-        ])
+    services = numbered_list([
+        ("quantity-takeoffs.html", "doc-search", "Quantity Takeoffs",
+         "Detailed measurements and quantities extracted directly from your construction drawings."),
+        ("construction-cost-estimating.html", "calculator", "Construction Cost Estimating",
+         "Labor, material, equipment and subcontractor costs prepared from plans and specifications."),
+        ("general-contractor-estimating.html", "building2", "General Contractor Estimating",
+         "Full-project, multi-trade estimates and bid-ready packages for general contractors."),
+        ("subcontractor-estimating.html", "wrench", "Subcontractor Estimating",
+         "Trade-specific takeoffs and pricing so subs can bid faster and more competitively."),
+        ("monthly-estimating-support.html", "refresh", "Monthly Estimating Support",
+         "Reserved, ongoing estimating capacity without hiring a full-time in-house estimator."),
+        ("services.html", "list-check", "Bid Preparation & Review",
+         "Bid summaries, scope breakdowns, scope-gap review, bid leveling and value engineering."),
     ])
 
     who_we_serve = [
@@ -93,8 +111,8 @@ def build_home():
   <div class="container section" style="padding-block:clamp(56px,8vw,104px)">
     <div class="hero-grid">
       <div class="stagger">
-        <span class="pill"><span class="dot"></span> Your estimating department, on demand</span>
-        <h1 style="margin-top:20px">Bid more projects without hiring another <span class="gradient-text">full-time estimator</span>.</h1>
+        <span class="eyebrow on-dark">Construction estimating &middot; Nationwide</span>
+        <h1 style="margin-top:22px"><span class="serif-accent" style="color:#cddcef">Your estimating department,</span><br>on demand.</h1>
         <p class="lead" style="color:#cdddf7;margin-top:20px;max-width:54ch">
           Mobi Estimates helps contractors complete more bids with fast, accurate, bid-ready construction estimates — powered by AI and reviewed by real estimators.</p>
         <div class="flex gap-3 wrap" style="margin-top:30px">
@@ -144,6 +162,7 @@ def build_home():
       <p class="lead mt-3">Send us your plans, specifications, bid documents and project details. Our team organizes the scope, completes the takeoff, prepares the pricing, reviews the estimate and delivers a professional, bid-ready package.</p>
     </div>
     <div class="grid cols-4 mt-8">%s</div>
+    <div class="mt-8">%s</div>
   </div>
 </section>
 
@@ -152,11 +171,11 @@ def build_home():
     <div class="flex items-center wrap reveal" style="justify-content:space-between;gap:18px">
       <div style="max-width:560px">
         <span class="eyebrow">What we do</span>
-        <h2 style="margin-top:14px">Estimating services for every stage of the bid</h2>
+        <h2 style="margin-top:14px">Estimating services for <span class="serif-accent">every stage</span> of the bid</h2>
       </div>
       %s
     </div>
-    <div class="grid cols-3 mt-8">%s</div>
+    <div class="mt-8">%s</div>
   </div>
 </section>
 
@@ -210,6 +229,12 @@ def build_home():
         icon("calculator"), rows_html, icon("check-circle"),
         icon("home"), icon("building"), icon("truck"), icon("building2"), icon("hammer"), icon("cube"),
         benefit_cards,
+        stats_band([
+            ("50", "States served, nationwide"),
+            ('3&ndash;7<span class="unit">days</span>', "Standard turnaround"),
+            ("All", "Trades &amp; CSI divisions"),
+            ("100%", "Human-reviewed estimates"),
+        ]),
         btn("View all services", "services.html", "outline", "arrow-right"),
         services, steps_html,
         btn("See the full process", "how-it-works.html", "outline", "arrow-right"),
@@ -259,12 +284,16 @@ def build_services():
         ]),
     ]
     sections = ""
+    counter = 0
     for gi, (label, items) in enumerate(groups):
-        cards = "".join(service_card(h, ic, t, d, i * 60) for i, (h, ic, t, d) in enumerate(items))
-        sections += '''<div class="reveal" style="margin-top:%dpx">
+        rows = ""
+        for (h, ic, t, d) in items:
+            counter += 1
+            rows += numbered_item(counter, h, ic, t, d)
+        sections += '''<div class="reveal" style="margin-top:%dpx;margin-bottom:18px">
           <span class="eyebrow">%s</span>
         </div>
-        <div class="grid cols-2 mt-4">%s</div>''' % (0 if gi == 0 else 56, label, cards)
+        <div class="num-list">%s</div>''' % (0 if gi == 0 else 52, label, rows)
 
     detail_anchors = '''
 <section class="section band-alt">

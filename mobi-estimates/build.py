@@ -12,7 +12,7 @@ SITE_NAME = "Mobi Estimates"
 PHONE = "(800) 555-0142"
 PHONE_HREF = "+18005550142"
 EMAIL = "estimates@mobiestimates.com"
-ASSET_VER = "5"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "6"  # bump to bust browser cache when CSS/JS change
 
 # --------------------------------------------------------------------------
 # Icons (Heroicons-style, 24x24 outline). Stored as inner markup.
@@ -225,7 +225,7 @@ def page(filename, title, description, body, active="", extra_head=""):
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css?v=%s">
 %s
 </head>
