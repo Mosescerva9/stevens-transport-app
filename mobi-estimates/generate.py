@@ -109,27 +109,35 @@ def build_home():
 <section class="hero">
   <div class="blueprint"></div><div class="glow a"></div><div class="glow b"></div>
   <div class="container section" style="padding-block:clamp(56px,8vw,104px)">
-    <div class="hero-grid">
-      <div class="stagger">
+    <div class="hero-top stagger">
+      <div>
         <span class="eyebrow on-dark">Construction estimating &middot; Nationwide</span>
         <h1 style="margin-top:22px"><span class="serif-accent" style="color:#cddcef">Your estimating department,</span><br>on demand.</h1>
-        <p class="lead" style="color:#cdddf7;margin-top:20px;max-width:54ch">
+      </div>
+      <div>
+        <p class="lead" style="color:#cdddf7;max-width:46ch">
           Mobi Estimates helps contractors complete more bids with fast, accurate, bid-ready construction estimates — powered by AI and reviewed by real estimators.</p>
-        <div class="flex gap-3 wrap" style="margin-top:30px">
+        <div class="flex gap-3 wrap" style="margin-top:24px">
           %s
           %s
         </div>
-        <div class="flex gap-4 wrap" style="margin-top:30px;color:#9fb4d4;font-size:.9rem">
-          <span class="flex items-center gap-2">%s All trades &amp; divisions</span>
-          <span class="flex items-center gap-2">%s Nationwide, USA</span>
+        <div class="flex gap-4 wrap" style="margin-top:22px;color:#9fb4d4;font-size:.9rem">
+          <span class="flex items-center gap-2">%s All trades</span>
+          <span class="flex items-center gap-2">%s Nationwide</span>
           <span class="flex items-center gap-2">%s Human-reviewed</span>
         </div>
-        <p style="margin-top:18px"><a href="services.html" style="color:#8fb8fb;font-weight:600;display:inline-flex;align-items:center;gap:8px">Explore our services %s</a></p>
+        <p style="margin-top:16px"><a href="services.html" style="color:#8fb8fb;font-weight:600;display:inline-flex;align-items:center;gap:8px">Explore our services %s</a></p>
       </div>
-      <div class="reveal-scale">
-        <div class="estimate-card float">
+    </div>
+    <div class="hero-figure reveal-scale">
+      <div class="framed">
+        <div class="hero-photo">
+          <img src="assets/img/hero-structure.jpg" alt="Looking up through a structural glass roof toward a high-rise building" width="1400" height="642" fetchpriority="high">
+          <div class="hero-photo-tint"></div>
+        </div>
+        <div class="estimate-card float hero-float-card">
           <div class="ec-head">
-            <div class="flex items-center gap-2"><span class="icon-box" style="margin:0;width:38px;height:38px">%s</span><strong style="color:#0b1d3a">Sample estimate summary</strong></div>
+            <div class="flex items-center gap-2"><span class="icon-box" style="margin:0;width:38px;height:38px">%s</span><strong style="color:#16243f">Sample estimate summary</strong></div>
             <span class="tag">Bid-ready</span>
           </div>
           <div class="animate-bar">%s</div>

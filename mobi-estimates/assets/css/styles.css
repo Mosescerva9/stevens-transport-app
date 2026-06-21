@@ -553,5 +553,15 @@ body::before {
 .serif-accent { font-family: "Fraunces", serif; font-style: italic; font-weight: 500; }
 
 /* Framed media inset, like the reference hero photo */
-.framed { padding: 10px; background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.framed { padding: 10px; background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); position: relative; }
 .framed > * { border-radius: calc(var(--radius-lg) - 10px); }
+
+/* Hero: headline row on top, framed photo below (Calibore layout) */
+.hero-top { display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px 48px; align-items: end; }
+@media (max-width: 860px) { .hero-top { grid-template-columns: 1fr; align-items: start; } }
+.hero-figure { margin-top: clamp(34px, 5vw, 56px); position: relative; }
+.hero-photo { position: relative; overflow: hidden; }
+.hero-photo img { width: 100%; height: clamp(280px, 40vw, 460px); object-fit: cover; display: block; }
+.hero-photo-tint { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,24,48,.28), rgba(12,24,48,0) 32%, rgba(12,24,48,.5)); }
+.hero-float-card { position: absolute; left: 26px; bottom: 26px; width: min(330px, 42%); }
+@media (max-width: 900px) { .hero-float-card { position: static; width: auto; margin-top: 12px; } }
