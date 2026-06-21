@@ -12,6 +12,7 @@ SITE_NAME = "Mobi Estimates"
 PHONE = "(800) 555-0142"
 PHONE_HREF = "+18005550142"
 EMAIL = "estimates@mobiestimates.com"
+ASSET_VER = "2"  # bump to bust browser cache when CSS/JS change
 
 # --------------------------------------------------------------------------
 # Icons (Heroicons-style, 24x24 outline). Stored as inner markup.
@@ -225,7 +226,7 @@ def page(filename, title, description, body, active="", extra_head=""):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/styles.css?v=%s">
 %s
 </head>
 <body>
@@ -234,10 +235,10 @@ def page(filename, title, description, body, active="", extra_head=""):
 %s
 </main>
 %s
-<script src="assets/js/site.js" defer></script>
+<script src="assets/js/site.js?v=%s" defer></script>
 </body>
-</html>''' % (title, description, title, description, extra_head,
-              header(active), body, footer())
+</html>''' % (title, description, title, description, ASSET_VER, extra_head,
+              header(active), body, footer(), ASSET_VER)
     path = os.path.join(OUT, filename)
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)

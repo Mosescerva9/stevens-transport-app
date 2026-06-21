@@ -134,13 +134,11 @@ p { margin: 0; }
 /* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 50;
-  transition: background .3s var(--ease), box-shadow .3s var(--ease), border-color .3s;
-  background: rgba(248, 250, 252, .82);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  backdrop-filter: saturate(180%) blur(14px);
-  border-bottom: 1px solid transparent;
+  transition: box-shadow .3s var(--ease), border-color .3s var(--ease);
+  background: #ffffff;
+  border-bottom: 1px solid var(--line-soft);
 }
-.site-header.scrolled { background: rgba(255,255,255,.9); box-shadow: 0 6px 24px -16px rgba(8,20,39,.35); border-bottom-color: var(--line-soft); }
+.site-header.scrolled { box-shadow: 0 6px 24px -16px rgba(8,20,39,.35); border-bottom-color: var(--line); }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 18px; }
 .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .brand img { height: 34px; width: auto; }
