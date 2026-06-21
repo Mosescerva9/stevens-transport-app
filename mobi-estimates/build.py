@@ -12,7 +12,7 @@ SITE_NAME = "Mobi Estimates"
 PHONE = "(800) 555-0142"
 PHONE_HREF = "+18005550142"
 EMAIL = "estimates@mobiestimates.com"
-ASSET_VER = "2"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "3"  # bump to bust browser cache when CSS/JS change
 
 # --------------------------------------------------------------------------
 # Icons (Heroicons-style, 24x24 outline). Stored as inner markup.
@@ -71,7 +71,7 @@ ICONS = {
 def icon(name, cls=""):
     inner = ICONS.get(name, "")
     c = ' class="%s"' % cls if cls else ""
-    return ('<svg%s viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    return ('<svg%s width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
             'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" '
             'aria-hidden="true">%s</svg>') % (c, inner)
 

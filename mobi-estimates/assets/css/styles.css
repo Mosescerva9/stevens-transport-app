@@ -130,6 +130,7 @@ p { margin: 0; }
   display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border-radius: 999px;
   background: #eef3fb; color: var(--brand-700); font-size: .82rem; font-weight: 600; border: 1px solid #dde8f8;
 }
+.tag svg { width: 15px; height: 15px; flex-shrink: 0; }
 
 /* ---------- Header ---------- */
 .site-header {
@@ -149,7 +150,10 @@ p { margin: 0; }
 }
 .nav-link:hover { color: var(--navy-900); background: rgba(15,33,58,.05); }
 .nav-link.active { color: var(--brand-700); }
+.nav-link { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.inline-chev, .nav-link svg { width: 15px; height: 15px; opacity: .7; }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-links { flex-wrap: nowrap; }
 
 /* Dropdown */
 .has-menu { position: relative; }
