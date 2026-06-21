@@ -345,8 +345,8 @@ def service_detail(filename, title_seo, eyebrow, h1, intro, included, deliverabl
         <h2 class="mt-2 mb-4">Detailed, organized and bid-ready</h2>
         %s
       </div>
-      <div class="reveal" data-delay="80">
-        <div class="card" style="position:sticky;top:96px">
+      <div>
+        <div class="card reveal" data-delay="80" style="position:sticky;top:96px">
           <h3>Typical deliverables</h3>
           <p class="muted mt-2 mb-3" style="font-size:.95rem">What you can expect to receive with this service.</p>
           %s

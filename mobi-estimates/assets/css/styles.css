@@ -395,6 +395,105 @@ p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-  .reveal, .reveal-left, .reveal-scale { opacity: 1 !important; transform: none !important; }
+  .reveal, .reveal-left, .reveal-scale { opacity: 1 !important; transform: none !important; filter: none !important; }
   .float { animation: none !important; }
+}
+
+/* =========================================================================
+   Refinements — depth + hand-crafted micro-interactions
+   ========================================================================= */
+
+/* Premium selection + crafted focus rings */
+::selection { background: rgba(37, 99, 235, .16); color: var(--navy-900); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: none; box-shadow: var(--ring); border-radius: 8px; }
+
+/* Ambient page wash — a barely-there tint so large surfaces read as lit, not flat */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 34% at 86% 6%, rgba(37, 99, 235, .045), transparent 62%),
+    radial-gradient(42% 40% at 4% 92%, rgba(11, 29, 58, .045), transparent 60%);
+}
+
+/* Light "expensive" surface: soft gradient + faint blueprint hairlines, masked to fade */
+.band-alt {
+  position: relative;
+  background:
+    radial-gradient(70% 90% at 100% 0, rgba(37, 99, 235, .055), transparent 58%),
+    radial-gradient(60% 70% at 0 100%, rgba(11, 29, 58, .045), transparent 60%),
+    linear-gradient(180deg, #ffffff, #eef3f9);
+  border-top: 1px solid rgba(15, 33, 58, .06);
+  border-bottom: 1px solid rgba(15, 33, 58, .06);
+}
+.band-alt::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(15, 33, 58, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 33, 58, .045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(125% 100% at 50% 0, #000, transparent 72%);
+  mask-image: radial-gradient(125% 100% at 50% 0, #000, transparent 72%);
+}
+.band-alt > .container { position: relative; z-index: 1; }
+
+/* Dark surface: layered glow + fine film grain for a printed, premium feel */
+.band-dark { position: relative; overflow: hidden; }
+.band-dark::before {
+  content: ""; position: absolute; z-index: 0; pointer-events: none;
+  width: 620px; height: 620px; top: -240px; right: -160px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, .35), transparent 65%);
+  filter: blur(40px); opacity: .5;
+}
+.band-dark::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.band-dark > .container { position: relative; z-index: 1; }
+
+/* Reveal: develop into focus (subtle blur) — reads hand-tuned, not stock fade-up */
+.reveal, .reveal-left, .reveal-scale { filter: blur(7px); transition: opacity .7s var(--ease), transform .7s var(--ease), filter .7s var(--ease); }
+.reveal.in, .reveal-left.in, .reveal-scale.in { filter: blur(0); }
+
+/* Cards: the icon fills with brand on hover, the cue arrow slides */
+.card .icon-box { transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease); }
+.card-hover:hover .icon-box {
+  background: linear-gradient(155deg, var(--brand-500), var(--brand-700));
+  color: #fff; border-color: transparent; transform: translateY(-2px);
+}
+.card-hover .tag { transition: gap .25s var(--ease), background .25s var(--ease); }
+.card-hover .tag svg { transition: transform .3s var(--ease); }
+.card-hover:hover .tag { background: #e2ecfc; }
+.card-hover:hover .tag svg { transform: translate(3px, -3px); }
+
+/* Nav links: an underline that draws from the left */
+.nav-link::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: 5px; height: 2px;
+  background: var(--brand-500); border-radius: 2px;
+  transform: scaleX(0); transform-origin: left; transition: transform .28s var(--ease);
+}
+.nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
+.nav-link:hover { background: transparent; }
+
+/* Primary button: a quiet light-sweep on hover + icon nudge */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -130%; width: 55%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .28), transparent);
+  transform: skewX(-18deg); transition: left .65s var(--ease); pointer-events: none;
+}
+.btn-primary:hover::after { left: 150%; }
+.btn svg { transition: transform .25s var(--ease); }
+.btn:hover svg:last-child { transform: translateX(2px); }
+
+/* Step markers: lift slightly as they enter view */
+.step .num { transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+.step:hover .num { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(29, 78, 216, .6); }
+
+/* Quote accent + feature icons get the same crafted hover */
+.feature .fi { transition: transform .3s var(--ease), background .3s var(--ease); }
+.feature:hover .fi { transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-scale { filter: none !important; }
+  .btn-primary::after { display: none; }
 }

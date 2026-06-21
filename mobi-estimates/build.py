@@ -12,7 +12,7 @@ SITE_NAME = "Mobi Estimates"
 PHONE = "(800) 555-0142"
 PHONE_HREF = "+18005550142"
 EMAIL = "estimates@mobiestimates.com"
-ASSET_VER = "3"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "4"  # bump to bust browser cache when CSS/JS change
 
 # --------------------------------------------------------------------------
 # Icons (Heroicons-style, 24x24 outline). Stored as inner markup.
