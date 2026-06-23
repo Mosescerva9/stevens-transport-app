@@ -1,0 +1,150 @@
+# Mobi Estimates — Client Portal
+
+A self-service onboarding, project-submission, and estimate-delivery portal for
+**Mobi Estimates** (M-O-B-I) — outsourced construction estimating for GCs, subs,
+developers and builders.
+
+> **Status: Milestone 1 — Foundation (in progress).** This folder currently holds
+> the service-independent foundation (database schema + RLS, env template, setup
+> docs, owner decisions). The runnable Next.js app is scaffolded **next**, once the
+> owner provisions Supabase/Stripe/Resend (so it can be built and tested with real
+> keys — see "Why no app code yet" below).
+
+---
+
+## Architecture decision (recorded)
+
+The portal is a **separate Next.js + Supabase application deployed to Vercel** at
+`portal.mobiestimates.com`. The existing marketing site stays on GitHub Pages and
+links to the portal for Login / Create Account / Client Portal.
+
+**Why not reuse the existing repo?** This repo (`stevens-transport-app`) contains
+two unrelated things: a Next.js driver-application app for *Stevens Transport*, and
+the static *Mobi Estimates* marketing site. The marketing site is static (GitHub
+Pages) and **cannot run a backend**. A SaaS portal needs server runtime + Supabase
++ Stripe webhooks, so it lives in its own repo/host to keep concerns clean and easy
+to hand to future developers. This `mobi-portal/` folder is the **seed** for that
+new repo — extract it (`git subtree`/copy) into a fresh repo when ready.
+
+**Stack:** Next.js 15 (App Router) + TypeScript · Supabase (Auth, Postgres, RLS,
+Storage) · Stripe Checkout + Billing · Resend · React Hook Form + Zod · Tailwind +
+shadcn/ui · Vercel. No GoHighLevel, no paid CRM, no hard-coded secrets.
+
+## Why no app code yet (honesty note)
+
+The build environment has **no Supabase/Stripe/Resend project and restricted network
+egress**, so an app scaffold here could not be run, type-checked end-to-end, or
+tested against real services. Per the brief ("do not claim something works unless it
+was tested"), Milestone 1 first delivers the parts that are correct and verifiable
+without live services: the **schema, RLS policies, env contract, and docs**. The app
+scaffold (auth flow, protected portal shell, Stripe routes) is generated in the next
+step against your provisioned keys so it's genuinely testable.
+
+---
+
+## What's in this folder (Milestone 1 foundation)
+
+```
+mobi-portal/
+├── README.md                      ← this file
+├── OWNER_DECISIONS.md             ← business/legal values only the owner can supply
+├── .env.example                   ← full env contract (no secrets)
+└── supabase/
+    ├── migrations/
+    │   ├── 0001_schema.sql        ← tables, enums, indexes, triggers, project numbering
+    │   └── 0002_policies.sql      ← RLS helpers + policies, signup trigger, storage notes
+    └── seed.sql                   ← LOCAL ONLY, clearly-labeled fictional/placeholder data
+```
+
+## Proposed app structure (next step)
+
+```
+src/
+├── app/
+│   ├── (marketing)/               ← optional: pricing/checkout entry if unified later
+│   ├── (auth)/login, /signup, /reset, /verify
+│   ├── checkout/success, /cancel
+│   ├── onboarding/                ← required checklist (saves progress per section)
+│   ├── portal/                    ← client dashboard, projects, questions, deliverables
+│   ├── admin/                     ← estimator/reviewer/admin production dashboard
+│   └── api/
+│       ├── stripe/checkout        ← create Checkout Session (records agreement version)
+│       └── stripe/webhook         ← verified events → subscriptions (idempotent)
+├── lib/
+│   ├── supabase/{client,server,admin}.ts   ← browser / RLS server / service-role
+│   ├── stripe.ts, resend.ts, auth.ts (role guards)
+│   └── validation/ (zod schemas)
+├── components/ui (shadcn) + portal components
+└── config/site.ts, plans.ts (reads from DB; OWNER_DECISIONS placeholders)
+```
+
+---
+
+## Setup (when ready to run the app)
+
+### 1. Supabase
+1. Create a project at supabase.com. Copy URL, anon key, service-role key into `.env.local`.
+2. Install CLI: `npm i -g supabase`. Link: `supabase link --project-ref <ref>`.
+3. Apply schema + policies: `supabase db push` (runs `supabase/migrations/*`).
+4. (Local dev only) load placeholders: `supabase db execute -f supabase/seed.sql`.
+5. Storage: create **private** buckets `project-files` and `deliverables`; add the
+   member/staff policies noted at the bottom of `0002_policies.sql`. Use signed URLs.
+
+### 2. Stripe
+1. Create one **Price** per plan (recurring monthly). Paste IDs into `.env.local`
+   and/or the `plans.stripe_price_id` column.
+2. Add a webhook endpoint → `https://portal.mobiestimates.com/api/stripe/webhook`,
+   subscribe to: `checkout.session.completed`, `customer.subscription.created`,
+   `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`,
+   `invoice.payment_failed`. Copy the signing secret to `STRIPE_WEBHOOK_SECRET`.
+3. The webhook handler verifies signatures and is **idempotent** (stores processed
+   event IDs in `webhook_events`). Success-page redirects are never trusted as proof
+   of payment.
+
+### 3. Resend
+Verify your sending domain, set `RESEND_API_KEY` and `EMAIL_FROM`.
+
+### 4. Vercel
+Import the portal repo, add all `.env` vars (mark `SUPABASE_SERVICE_ROLE_KEY` and
+Stripe secrets as server-only / not `NEXT_PUBLIC_`), deploy, point DNS.
+
+---
+
+## Security model (enforced in `0002_policies.sql`)
+- **Default-deny RLS** on every table; clients see only rows for companies they
+  belong to; staff (estimator/reviewer/admin) see operational data across companies.
+- **Never trust the frontend** — RLS is the source of truth; route guards are UX only.
+- **Service-role key is server-only** (webhooks/admin); never shipped to the browser.
+- **Private file storage** + short-lived signed URLs; no public file URLs.
+- **internal_note** on the project timeline is hidden from clients (clients read the
+  `client_timeline()` RPC / a client-safe view, not the base table).
+- Stripe is the only place card data lives; passwords are handled by Supabase Auth.
+
+## Roles
+`client` · `estimator` · `reviewer` · `admin`. A company has many users; users are
+linked via `company_members`. Bootstrap the first admin by adding your email to
+`ADMIN_BOOTSTRAP_EMAILS` (handled in the app's auth step) or by setting
+`profiles.role = 'admin'` directly in Supabase.
+
+## How to edit common things
+- **Plans/prices:** `plans` table (or `config/plans.ts` defaults) — values are
+  placeholders until OWNER_DECISIONS.md is confirmed.
+- **FAQ / assistant knowledge:** `faq_entries` table (approved content only).
+- **Training videos:** `training_modules.video_url`.
+- **Agreement text:** `service_agreements` (versioned; acceptances are recorded).
+
+## Launch checklist (high level)
+- [ ] OWNER_DECISIONS.md completed
+- [ ] Supabase migrations applied; storage buckets + policies created
+- [ ] Stripe prices + webhook live and verified
+- [ ] Resend domain verified
+- [ ] Legal drafts reviewed by an attorney
+- [ ] First admin user created
+- [ ] Cross-company access test passes (client A cannot see client B)
+- [ ] Stripe test-mode end-to-end: checkout → webhook → subscription active → onboarding
+
+## Roadmap (milestones)
+M1 foundation (this) → M2 Stripe/checkout/webhooks → M3 onboarding → M4 project
+intake + files + validation → M5 admin dashboard → M6 questions + email → M7
+deliverables + revisions + capacity → M8 FAQ + assistant + tickets → M9 security/
+testing/deploy. Each milestone ends with lint, type-check, tests, and a summary.
