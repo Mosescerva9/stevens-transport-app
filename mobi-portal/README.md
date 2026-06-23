@@ -4,13 +4,30 @@ A self-service onboarding, project-submission, and estimate-delivery portal for
 **Mobi Estimates** (M-O-B-I) — outsourced construction estimating for GCs, subs,
 developers and builders.
 
-> **Status: Milestone 1 — Foundation + app shell.** This folder holds the
-> service-independent foundation (Supabase schema + RLS, env template, docs) **and**
-> a runnable Next.js + Supabase app shell (auth, role-protected portal/admin
-> layouts, middleware). The shell **type-checks (`tsc --noEmit`) and builds
-> (`next build`) cleanly** in CI here, but has **not** been run against a live
-> Supabase project (this environment can't reach Supabase — egress blocked). You
-> apply the migrations and add env keys to run it; see Setup below.
+> **Status: Milestone 1 — Foundation + app shell, now connected to a live
+> Supabase project.** This folder holds the service-independent foundation
+> (Supabase schema + RLS, env template, docs) **and** a runnable Next.js +
+> Supabase app shell (auth, role-protected portal/admin layouts, middleware).
+> The shell **type-checks (`tsc --noEmit`) and builds (`next build`) cleanly**.
+>
+> **Live Supabase project** `mobi-portal` (ref `kzgfcgzewmqwlxfadtgz`, org
+> "Moni estimates", region us-east-1, free tier) has been created and the
+> migrations applied: all 27 tables exist with RLS enabled, helper functions +
+> policies + the signup trigger are in place (plus `0003` hardening: pinned
+> `search_path` and revoked public EXECUTE on internal-only functions). The
+> signup trigger was verified end-to-end — a new `auth.users` row auto-creates a
+> `public.profiles` row with the default `client` role. Copy `.env.example` →
+> `.env.local` with the project URL + anon key to run locally.
+>
+> **One value still to add:** `SUPABASE_SERVICE_ROLE_KEY` (server-only secret,
+> from Dashboard → Project Settings → API). It's only needed for the admin
+> client / Stripe webhooks (Milestone 2+); auth and RLS work without it.
+>
+> **Note on this build environment:** the dev container's network egress is
+> restricted, so a *running* dev server here cannot reach `*.supabase.co`
+> directly (DB work above was done over the Supabase management API). Run the app
+> locally or on Vercel, where egress is open, to exercise the live auth flow in a
+> browser.
 
 ---
 
