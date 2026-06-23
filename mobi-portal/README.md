@@ -4,11 +4,13 @@ A self-service onboarding, project-submission, and estimate-delivery portal for
 **Mobi Estimates** (M-O-B-I) — outsourced construction estimating for GCs, subs,
 developers and builders.
 
-> **Status: Milestone 1 — Foundation (in progress).** This folder currently holds
-> the service-independent foundation (database schema + RLS, env template, setup
-> docs, owner decisions). The runnable Next.js app is scaffolded **next**, once the
-> owner provisions Supabase/Stripe/Resend (so it can be built and tested with real
-> keys — see "Why no app code yet" below).
+> **Status: Milestone 1 — Foundation + app shell.** This folder holds the
+> service-independent foundation (Supabase schema + RLS, env template, docs) **and**
+> a runnable Next.js + Supabase app shell (auth, role-protected portal/admin
+> layouts, middleware). The shell **type-checks (`tsc --noEmit`) and builds
+> (`next build`) cleanly** in CI here, but has **not** been run against a live
+> Supabase project (this environment can't reach Supabase — egress blocked). You
+> apply the migrations and add env keys to run it; see Setup below.
 
 ---
 
