@@ -298,7 +298,6 @@ def build_home():
           Mobi Estimates handles quantity takeoffs, cost estimates, bid preparation, and overflow estimating for contractors nationwide. Choose per-project pricing or ongoing monthly estimating support.</p>
         <div class="flex gap-3 wrap" style="margin-top:24px">
           %s
-          %s
         </div>
         <p class="reassure" style="margin-top:16px">%s Get started today &nbsp;•&nbsp; Choose the plan that fits your workload &nbsp;•&nbsp; Cancel anytime</p>
       </div>
@@ -392,7 +391,6 @@ def build_home():
 %s
 ''' % (
         btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", "lg", data="hero_join"),
-        btn(CTA_JOIN[0], CTA_JOIN[1], "ghost", size="lg", data="hero_join_secondary"),
         icon("check"),
         icon("calculator"), home_bars(), icon("check-circle"),
         trust_strip(),
