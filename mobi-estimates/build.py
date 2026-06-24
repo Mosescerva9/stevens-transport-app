@@ -162,15 +162,13 @@ def header(active=""):
       %s
       <div style="margin-top:auto;padding-top:18px;display:grid;gap:10px">
         %s
-        %s
       </div>
     </nav>
   </div>
 </header>''' % (SITE_NAME, SITE_NAME, nav_links,
-                btn(CTA_UPLOAD[0], CTA_UPLOAD[1], "primary", "upload", cls="hide-mobile", data="nav_upload_plans"),
+                btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", cls="hide-mobile", data="nav_join"),
                 icon("menu"), SITE_NAME, icon("x"), m_main, m_services,
-                btn(CTA_UPLOAD[0], CTA_UPLOAD[1], "primary", "upload", cls="btn-block", data="drawer_upload_plans"),
-                btn(CTA_PRICING[0], CTA_PRICING[1], "outline", cls="btn-block", data="drawer_pricing"))
+                btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", cls="btn-block", data="drawer_join"))
 
 
 def footer():
@@ -227,16 +225,15 @@ def footer():
     </div>
   </div>
 </footer>''' % (SITE_NAME, contact_rows, services_links,
-                btn(CTA_UPLOAD[0], "upload-plans.html", "primary", "upload", cls="btn-block", data="footer_upload_plans"),
+                btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", cls="btn-block", data="footer_join"),
                 SITE_NAME)
 
 
 def mobile_bar():
     return '''<div class="mobile-cta-bar" id="mobileCtaBar">
-  <a class="btn btn-primary" href="upload-plans.html" data-analytics="mbar_upload_plans">%s Upload Plans</a>
-  <a class="btn btn-outline" href="pricing.html" data-analytics="mbar_pricing">View Pricing</a>
+  <a class="btn btn-primary" href="%s" data-analytics="mbar_join">%s Join Now</a>
   <button class="mbar-close" aria-label="Dismiss quick actions">%s</button>
-</div>''' % (icon("upload"), icon("x"))
+</div>''' % (CTA_JOIN[1], icon("arrow-right"), icon("x"))
 
 
 def head_config():

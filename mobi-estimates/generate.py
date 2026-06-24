@@ -300,7 +300,7 @@ def build_home():
           %s
           %s
         </div>
-        <p class="reassure" style="margin-top:16px">%s Free plan review &nbsp;•&nbsp; Exact price before work begins &nbsp;•&nbsp; No long-term contract required</p>
+        <p class="reassure" style="margin-top:16px">%s Get started today &nbsp;•&nbsp; Choose the plan that fits your workload &nbsp;•&nbsp; Cancel anytime</p>
       </div>
     </div>
     <div class="hero-figure reveal-scale">
@@ -391,8 +391,8 @@ def build_home():
 
 %s
 ''' % (
-        btn(CTA_PRIMARY[0], CTA_PRIMARY[1], "primary", "upload", "lg", data="hero_upload_plans"),
-        btn(CTA_PRICING[0], CTA_PRICING[1], "ghost", size="lg", data="hero_view_pricing"),
+        btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", "lg", data="hero_join"),
+        btn(CTA_JOIN[0], CTA_JOIN[1], "ghost", size="lg", data="hero_join_secondary"),
         icon("check"),
         icon("calculator"), home_bars(), icon("check-circle"),
         trust_strip(),
@@ -403,13 +403,14 @@ def build_home():
         services,
         home_pricing_preview(),
         home_process_steps(),
-        btn(CTA_PRIMARY[0], CTA_PRIMARY[1], "primary", "upload", data="process_upload"),
+        btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", data="process_join"),
         project_vs_monthly(),
         deliverables_section(),
         fit_section(),
         founder_section(),
         qc_section(),
-        cta_band(),
+        cta_band(primary=(CTA_JOIN[0], CTA_JOIN[1], "arrow-right"),
+                 secondary=(CTA_JOIN[0], CTA_JOIN[1])),
     )
     page("index.html",
          "Mobi Estimates | Construction Estimating and Takeoff Services",

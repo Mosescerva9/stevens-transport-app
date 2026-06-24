@@ -227,4 +227,11 @@ CTA_CAPACITY = ("Request My Capacity Plan", "capacity-plan.html")
 CTA_PILOT = ("Start My 30-Day Pilot", "capacity-plan.html?plan=pilot")
 CTA_COMPARE = ("Compare Estimating Options", "pricing.html")
 
-ASSET_VER = "9"  # bump to bust browser cache when CSS/JS change
+# Account signup / subscription onboarding (the separate client portal app).
+# Homepage hero + mobile sticky bar point here to drive sign-ups.
+# TODO: confirm the live portal domain and update if the portal is hosted
+# elsewhere (e.g. the Vercel deployment URL) before launch.
+JOIN_URL = "https://portal.mobiestimates.com/signup"
+CTA_JOIN = ("Join Now", JOIN_URL)
+
+ASSET_VER = "10"  # bump to bust browser cache when CSS/JS change
