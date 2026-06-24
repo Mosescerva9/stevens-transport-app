@@ -234,4 +234,4 @@ CTA_COMPARE = ("Compare Estimating Options", "pricing.html")
 JOIN_URL = "https://portal.mobiestimates.com/signup"
 CTA_JOIN = ("Join Now", JOIN_URL)
 
-ASSET_VER = "10"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "11"  # bump to bust browser cache when CSS/JS change

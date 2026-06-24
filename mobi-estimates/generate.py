@@ -304,19 +304,7 @@ def build_home():
     </div>
     <div class="hero-figure reveal-scale">
       <div class="framed">
-        <div class="hero-photo">
-          <img src="assets/img/hero-structure.jpg" alt="Structural steel and glass of a building under construction" width="1400" height="642" fetchpriority="high">
-          <div class="hero-photo-tint"></div>
-        </div>
-        <div class="estimate-card float hero-float-card">
-          <div class="ec-head">
-            <div class="flex items-center gap-2"><span class="icon-box" style="margin:0;width:38px;height:38px">%s</span><strong style="color:#16243f">Estimate summary</strong></div>
-            <span class="tag">Bid-ready</span>
-          </div>
-          <div class="animate-bar">%s</div>
-          <div class="ec-row"><span>%s Scope &amp; quantities reviewed</span><b style="color:#16a34a">Checked</b></div>
-          <div class="ec-total"><span>Organized, trade-by-trade</span><b>Proposal-ready</b></div>
-        </div>
+        <img class="hero-doc" src="assets/img/bid-estimate.png" alt="Sample Mobi Estimates construction bid: a branded bid summary showing the total bid amount and a division-by-division cost breakdown, alongside a detailed Division 03 concrete estimate" width="1535" height="1024" fetchpriority="high">
       </div>
     </div>
   </div>
@@ -392,7 +380,6 @@ def build_home():
 ''' % (
         btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", "lg", data="hero_join"),
         icon("check"),
-        icon("calculator"), home_bars(), icon("check-circle"),
         trust_strip(),
         pain_cards,
         btn("Get Additional Estimating Capacity", "upload-plans.html", "primary", "upload", data="pain_cta"),
