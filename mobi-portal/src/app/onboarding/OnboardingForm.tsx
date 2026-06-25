@@ -278,10 +278,15 @@ export function OnboardingForm({
                 onChange={(e) => setAgreed(e.target.checked)}
               />
               <span>
-                I agree to Mobi Estimates&rsquo; Terms of Service and Estimating
-                Service Agreement.{" "}
-                {/* TODO: link to finalized, attorney-reviewed legal pages (Legal milestone). */}
-                <span className="text-slate-400">(Terms pages coming soon.)</span>
+                I agree to Mobi Estimates&rsquo;{" "}
+                <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="/legal/estimating-agreement" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">
+                  Estimating Service Agreement
+                </a>
+                .
               </span>
             </label>
 

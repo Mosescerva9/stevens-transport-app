@@ -162,6 +162,13 @@ export function BillingPlans({
             Quote requests open soon — your Mobi contact will send a fixed scope and price.
           </p>
         </div>
+
+        <p className="mx-auto mt-8 max-w-xl text-center text-xs text-slate-400">
+          Subscriptions renew monthly and can be canceled anytime. By subscribing you agree to our{" "}
+          <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-brand">Terms of Service</a>,{" "}
+          <a href="/legal/estimating-agreement" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-brand">Estimating Service Agreement</a>, and{" "}
+          <a href="/legal/cancellation-refund" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-brand">Cancellation &amp; Refund Policy</a>.
+        </p>
       </div>
     </main>
   );
