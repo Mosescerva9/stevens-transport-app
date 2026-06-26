@@ -50,6 +50,8 @@ export interface Offer {
   order: number;
   /** Marks the visually emphasized "Most Popular" plan. */
   mostPopular: boolean;
+  /** Approved differentiating feature bullets (monthly plans). */
+  features?: string[];
 }
 
 /** Promotion: 50% off the first month, applied exactly once, monthly plans only. */
@@ -72,10 +74,18 @@ export const OFFERS: Offer[] = [
     regularAmountCents: 99_500, // $995/mo
     firstMonthAmountCents: 49_750, // $497.50 first month
     firstMonthDiscountApplies: true,
-    ctaLabel: "Choose This Plan",
+    ctaLabel: "Choose Starter",
     stripePriceEnvVar: "STRIPE_PRICE_STARTER",
     order: 1,
     mostPopular: false,
+    features: [
+      "Up to 2 estimates per month",
+      "1 active estimate at a time",
+      "Construction takeoffs with labor & material pricing",
+      "AI-assisted and human-reviewed",
+      "Standard scheduling",
+      "Month-to-month — cancel anytime",
+    ],
   },
   {
     id: "growth",
@@ -86,10 +96,19 @@ export const OFFERS: Offer[] = [
     regularAmountCents: 199_500, // $1,995/mo
     firstMonthAmountCents: 99_750, // $997.50 first month
     firstMonthDiscountApplies: true,
-    ctaLabel: "Choose This Plan",
+    ctaLabel: "Choose Growth",
     stripePriceEnvVar: "STRIPE_PRICE_GROWTH",
     order: 2,
     mostPopular: true,
+    features: [
+      "Up to 5 estimates per month",
+      "2 active estimates at a time",
+      "Construction takeoffs with labor & material pricing",
+      "AI-assisted and human-reviewed",
+      "Saved company rates & markups",
+      "Priority scheduling",
+      "Month-to-month — cancel anytime",
+    ],
   },
   {
     id: "estimating_department",
@@ -100,10 +119,20 @@ export const OFFERS: Offer[] = [
     regularAmountCents: 299_500, // $2,995/mo
     firstMonthAmountCents: 149_750, // $1,497.50 first month
     firstMonthDiscountApplies: true,
-    ctaLabel: "Choose This Plan",
+    ctaLabel: "Choose Estimating Department",
     stripePriceEnvVar: "STRIPE_PRICE_ESTIMATING_DEPARTMENT",
     order: 3,
     mostPopular: false,
+    features: [
+      "Up to 8 estimates per month",
+      "3 active estimates at a time",
+      "Construction takeoffs with labor & material pricing",
+      "AI-assisted and human-reviewed",
+      "Saved company rates & markups",
+      "Priority scheduling",
+      "Addenda & revision handling",
+      "Month-to-month — cancel anytime",
+    ],
   },
   {
     id: "pay_per_project",

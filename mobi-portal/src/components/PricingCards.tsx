@@ -88,6 +88,17 @@ export function MonthlyPlanCard({ offer, cta }: { offer: Offer; cta: ReactNode }
         month. This is a monthly subscription. No free trial.
       </p>
 
+      {offer.features && offer.features.length > 0 && (
+        <ul className="mt-4 space-y-2 text-sm text-slate-600">
+          {offer.features.map((f) => (
+            <li key={f} className="flex gap-2">
+              <span aria-hidden className="mt-0.5 text-brand">✓</span>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div className="mt-6">{cta}</div>
     </article>
   );
