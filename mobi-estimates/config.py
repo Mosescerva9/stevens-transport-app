@@ -81,11 +81,12 @@ PROJECT_PLANS = [
         "period": "one-time",
         "best_for": "For contractors who need one professional construction estimate without a monthly subscription.",
         "features": [
-            "One professional construction estimate",
+            "One purchased estimate",
             "Construction takeoff with labor and material pricing",
             "AI-assisted and human-reviewed",
             "Contractor-ready Excel and PDF delivery",
-            "One-time purchase — not a subscription",
+            "One-time payment — no subscription, no automatic renewal",
+            "Another estimate requires a new purchase or a monthly plan",
         ],
         "cta": "Order One Estimate",
         "href": "https://portal.mobiestimates.com/start?plan=pay_per_project",
@@ -103,16 +104,8 @@ PROJECT_PRICING_DISCLAIMER = (
 # --------------------------------------------------------------------------
 # Three monthly subscription plans. New subscribers get 50% off the FIRST month
 # (once); regular monthly pricing begins with the second month. CTA hands off to
-# the portal checkout, preserving the selected plan. Feature bullets are kept to
-# approved, non-invented language (no specific bid/project limits or guarantees).
-_MONTHLY_FEATURES = [
-    "Professional construction estimates and takeoffs",
-    "Labor and material pricing",
-    "AI-assisted and human-reviewed",
-    "Contractor-ready Excel and PDF deliverables",
-    "Month-to-month — cancel anytime",
-]
-
+# the portal checkout, preserving the selected plan. Capacities and differentiators
+# are the approved, authoritative values — do not invent additional ones.
 MONTHLY_PLANS = [
     {
         "id": "starter",
@@ -120,9 +113,18 @@ MONTHLY_PLANS = [
         "price": "$995",
         "first_month": "$497.50",
         "period": "per month",
+        "capacity": "Up to 2 estimates per month",
+        "active": "1 active estimate at a time",
         "best_for": "Add estimating capacity without hiring another full-time estimator.",
-        "features": _MONTHLY_FEATURES,
-        "cta": "Choose This Plan",
+        "features": [
+            "Up to 2 estimates per month",
+            "1 active estimate at a time",
+            "Construction takeoffs with labor & material pricing",
+            "AI-assisted and human-reviewed",
+            "Standard scheduling",
+            "Month-to-month — cancel anytime",
+        ],
+        "cta": "Choose Starter",
         "href": "https://portal.mobiestimates.com/start?plan=starter",
         "featured": False,
     },
@@ -132,9 +134,19 @@ MONTHLY_PLANS = [
         "price": "$1,995",
         "first_month": "$997.50",
         "period": "per month",
+        "capacity": "Up to 5 estimates per month",
+        "active": "2 active estimates at a time",
         "best_for": "More monthly estimating capacity so you can submit more bids.",
-        "features": _MONTHLY_FEATURES,
-        "cta": "Choose This Plan",
+        "features": [
+            "Up to 5 estimates per month",
+            "2 active estimates at a time",
+            "Construction takeoffs with labor & material pricing",
+            "AI-assisted and human-reviewed",
+            "Saved company rates & markups",
+            "Priority scheduling",
+            "Month-to-month — cancel anytime",
+        ],
+        "cta": "Choose Growth",
         "href": "https://portal.mobiestimates.com/start?plan=growth",
         "featured": True,
         "badge": "Most Popular",
@@ -145,9 +157,20 @@ MONTHLY_PLANS = [
         "price": "$2,995",
         "first_month": "$1,497.50",
         "period": "per month",
+        "capacity": "Up to 8 estimates per month",
+        "active": "3 active estimates at a time",
         "best_for": "Your outsourced estimating department for steady monthly bid volume.",
-        "features": _MONTHLY_FEATURES,
-        "cta": "Choose This Plan",
+        "features": [
+            "Up to 8 estimates per month",
+            "3 active estimates at a time",
+            "Construction takeoffs with labor & material pricing",
+            "AI-assisted and human-reviewed",
+            "Saved company rates & markups",
+            "Priority scheduling",
+            "Addenda & revision handling",
+            "Month-to-month — cancel anytime",
+        ],
+        "cta": "Choose Estimating Department",
         "href": "https://portal.mobiestimates.com/start?plan=estimating_department",
         "featured": False,
     },

@@ -264,12 +264,9 @@ def build_home():
     ])
 
     pain_cards = "".join([
-        pain_card("doc-text", "Bid invitations are piling up", 0),
-        pain_card("users", "Internal estimators are already overloaded", 60),
-        pain_card("clock", "Deadlines are being missed", 120),
-        pain_card("briefcase", "PMs are completing takeoffs after hours", 0),
-        pain_card("calendar", "Hiring another estimator takes time and overhead", 60),
-        pain_card("x-circle", "Profitable opportunities are being turned down", 120),
+        pain_card("doc-text", "Bid invitations are piling up — more opportunities than your current estimating capacity can handle.", 0),
+        pain_card("briefcase", "Project managers are estimating after hours — pulling them away from active jobs and other work.", 60),
+        pain_card("calendar", "Hiring creates fixed overhead — recruiting, salary, payroll, software, training, and slow periods.", 120),
     ])
 
     outcomes = [
@@ -290,16 +287,18 @@ def build_home():
   <div class="container section" style="padding-block:clamp(48px,7vw,88px)">
     <div class="hero-top stagger">
       <div>
-        <span class="eyebrow on-dark">On-Demand Construction Estimating</span>
+        <span class="eyebrow on-dark">48-Hour, Human-Reviewed Construction Estimating</span>
         <h1 style="margin-top:22px">Bid more projects <span class="serif-accent" style="color:#cddcef">without hiring</span> another estimator.</h1>
       </div>
       <div>
-        <p class="lead" style="color:#cdddf7;max-width:48ch">
-          Mobi Estimates handles quantity takeoffs, cost estimates, bid preparation, and overflow estimating for contractors nationwide. Choose per-project pricing or ongoing monthly estimating support.</p>
+        <p class="lead" style="color:#cdddf7;max-width:52ch">
+          Upload your plans online and receive an AI-assisted, human-reviewed, contractor-ready estimate in as little as 48 hours — without a sales call or a lengthy onboarding process.</p>
         <div class="flex gap-3 wrap" style="margin-top:24px">
           %s
+          %s
         </div>
-        <p class="reassure" style="margin-top:16px">%s Get started today &nbsp;•&nbsp; Choose the plan that fits your workload &nbsp;•&nbsp; Cancel anytime</p>
+        <p class="reassure" style="margin-top:16px">%s One estimate for $599 &nbsp;•&nbsp; Monthly plans from $995 &nbsp;•&nbsp; 50%% off your first month</p>
+        <p style="margin-top:10px;max-width:54ch;font-size:.84rem;color:#aebfd5">Most standard-scope estimates are delivered within 48 hours after all required plans, documents, and project information are received. Larger or unusually complex projects may require a confirmed delivery timeline.</p>
       </div>
     </div>
     <div class="hero-figure reveal-scale">
@@ -379,10 +378,11 @@ def build_home():
 %s
 ''' % (
         btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", "lg", data="hero_join"),
+        btn("View Sample Estimate", "sample-estimate.html", "ghost", "arrow-right", "lg", data="hero_sample"),
         icon("check"),
         trust_strip(),
         pain_cards,
-        btn("Get Additional Estimating Capacity", "upload-plans.html", "primary", "upload", data="pain_cta"),
+        btn(CTA_JOIN[0], CTA_JOIN[1], "primary", "arrow-right", data="pain_cta"),
         outcome_cards,
         btn("View all services", "services.html", "outline", "arrow-right"),
         services,
@@ -395,7 +395,7 @@ def build_home():
         founder_section(),
         qc_section(),
         cta_band(primary=(CTA_JOIN[0], CTA_JOIN[1], "arrow-right"),
-                 secondary=(CTA_JOIN[0], CTA_JOIN[1])),
+                 secondary=("View Sample Estimate", "sample-estimate.html")),
     )
     page("index.html",
          "Mobi Estimates | Construction Estimating and Takeoff Services",
