@@ -344,25 +344,41 @@ def pain_card(ic, text, delay=0):
 
 
 def project_card(plan, delay=0):
+    """One-time Pay Per Project card ($599, not a subscription)."""
     feats = check_list(plan["features"])
-    badge = '<span class="pkg-badge">Recommended</span>' if plan.get("featured") else ""
+    period = plan.get("period")
+    suffix = '<span class="per"> %s</span>' % period if period else ""
     return '''<div class="card pkg %s reveal" data-delay="%d">
-  %s
+  <span class="pkg-badge">One-time option</span>
   <h3>%s</h3>
-  <div class="pkg-price">%s</div>
+  <div class="pkg-price">%s%s</div>
   <p class="pkg-sub">%s</p>
   %s
   %s
-</div>''' % ("featured" if plan.get("featured") else "", delay, badge, plan["name"], plan["price"],
+</div>''' % ("featured" if plan.get("featured") else "", delay, plan["name"], plan["price"], suffix,
              plan["best_for"], feats,
-             btn(plan["cta"], plan["href"], "primary" if plan.get("featured") else "outline",
+             btn(plan["cta"], plan["href"], "primary",
                  cls="btn-block", data="project_plan_%s" % plan["id"]))
 
 
 def monthly_card(plan, delay=0):
+    """Monthly subscription card with the 50%-off-first-month promotion.
+
+    Shows the discounted first-month price prominently, then the regular monthly
+    price beginning with the second month — never presenting the discount as the
+    permanent rate.
+    """
     feats = check_list(plan["features"])
     badge = '<span class="pkg-badge">%s</span>' % plan["badge"] if plan.get("badge") else ""
-    price = '<div class="pkg-price">%s<span class="per"> %s</span></div>' % (plan["price"], plan["period"])
+    first = plan.get("first_month")
+    if first:
+        price = (
+            '<span class="promo-flag">50%% off your first month</span>'
+            '<div class="pkg-price">%s<span class="per"> for your first month</span></div>'
+            '<p class="pkg-then">Then %s/month beginning with your second month.</p>'
+            % (first, plan["price"]))
+    else:
+        price = '<div class="pkg-price">%s<span class="per"> %s</span></div>' % (plan["price"], plan["period"])
     return '''<div class="card pkg %s reveal" data-delay="%d">
   %s
   <h3>%s</h3>
@@ -377,9 +393,9 @@ def monthly_card(plan, delay=0):
 
 
 def cta_band(heading="Ready to bid more work?",
-             sub="Upload your plans for a free scope review. We confirm the exact price, deliverables and turnaround before any work begins.",
+             sub="Compare our monthly plans and the one-time Pay Per Project option, then choose what fits your business.",
              primary=None, secondary=None):
-    primary = primary or (CTA_PRIMARY[0], CTA_PRIMARY[1], "upload")
+    primary = primary or (CTA_PRIMARY[0], CTA_PRIMARY[1], "arrow-right")
     secondary = secondary or (CTA_PRICING[0], CTA_PRICING[1])
     return '''<section class="section">
   <div class="container">

@@ -602,6 +602,17 @@ body::before {
 .pkg-price .per { font-size: .92rem; font-weight: 600; color: var(--slate-500); }
 .pkg .btn { margin-top: auto; }
 
+/* First-month promotion (monthly plan cards) */
+.promo-flag { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 999px;
+  background: #fef3c7; color: #92400e; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.pkg-then { margin-top: 6px; font-size: .9rem; color: var(--slate-500); }
+
+/* Pricing promo banner */
+.promo-banner { max-width: 680px; margin: 0 auto; text-align: center; padding: 16px 20px;
+  border: 1px solid #d7e3fb; background: #eef3fb; border-radius: 16px; }
+.promo-head { font-weight: 800; color: var(--brand-700); font-size: 1.05rem; }
+.promo-note { margin-top: 6px; font-size: .9rem; color: var(--slate-500); }
+
 /* Standard-bid explainer box */
 .standard-bid { background: #fff; border: 1px dashed #c7d3e6; border-radius: 16px; padding: 26px 28px; max-width: 880px; margin-inline: auto; }
 .standard-bid h3 { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin-bottom: 10px; }

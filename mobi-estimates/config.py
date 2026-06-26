@@ -70,46 +70,25 @@ TURNAROUND_NOTE = ("Turnaround depends on project size, scope, drawing quality, 
 # --------------------------------------------------------------------------
 # Pricing — project-based
 # --------------------------------------------------------------------------
+# Exactly ONE one-time option: Pay Per Project at $599. Not a subscription; the
+# 50% first-month discount does not apply. The CTA hands off to the portal
+# checkout, preserving the selected plan.
 PROJECT_PLANS = [
     {
-        "id": "single-trade",
-        "name": "Single-Trade Takeoff",
-        "price": "Starting at $199",
-        "best_for": "Subcontractors bidding one construction trade.",
+        "id": "pay-per-project",
+        "name": "One Project Estimate",
+        "price": "$599",
+        "period": "one-time",
+        "best_for": "For contractors who need one professional construction estimate without a monthly subscription.",
         "features": [
-            "Quantity takeoff", "Labor and material breakdown", "Marked-up drawings",
-            "Excel and PDF delivery", "One revision round", "Typical turnaround of 2–4 business days",
+            "One professional construction estimate",
+            "Construction takeoff with labor and material pricing",
+            "AI-assisted and human-reviewed",
+            "Contractor-ready Excel and PDF delivery",
+            "One-time purchase — not a subscription",
         ],
-        "cta": "Upload Plans for Exact Quote",
-        "href": "upload-plans.html",
-        "featured": False,
-    },
-    {
-        "id": "full-estimate",
-        "name": "Full Estimate",
-        "price": "Starting at $399",
-        "best_for": "Larger trade packages, home builders, remodelers, and smaller multi-trade projects.",
-        "features": [
-            "Quantity takeoff", "Labor pricing", "Material pricing", "Equipment pricing when applicable",
-            "Trade-by-trade cost breakdown", "Assumptions and exclusions", "Marked-up drawings",
-            "Proposal-ready estimate summary", "One revision round", "Typical turnaround of 3–5 business days",
-        ],
-        "cta": "Get My Project Priced",
-        "href": "upload-plans.html",
-        "featured": True,
-    },
-    {
-        "id": "gc-multi-trade",
-        "name": "GC & Multi-Trade Estimate",
-        "price": "Custom Quote",
-        "best_for": "Commercial, multifamily, industrial, civil, institutional, and larger full-project bids.",
-        "features": [
-            "Multi-trade estimating", "CSI division breakdown", "Bid leveling", "Scope-gap review",
-            "Alternates and allowances", "Subcontractor comparison support", "Bid-form support",
-            "Priority communication",
-        ],
-        "cta": "Request a GC Estimate",
-        "href": "upload-plans.html",
+        "cta": "Order One Estimate",
+        "href": "https://portal.mobiestimates.com/start?plan=pay_per_project",
         "featured": False,
     },
 ]
@@ -122,72 +101,70 @@ PROJECT_PRICING_DISCLAIMER = (
 # --------------------------------------------------------------------------
 # Pricing — monthly subscriptions (capacity-based, NOT hours)
 # --------------------------------------------------------------------------
+# Three monthly subscription plans. New subscribers get 50% off the FIRST month
+# (once); regular monthly pricing begins with the second month. CTA hands off to
+# the portal checkout, preserving the selected plan. Feature bullets are kept to
+# approved, non-invented language (no specific bid/project limits or guarantees).
+_MONTHLY_FEATURES = [
+    "Professional construction estimates and takeoffs",
+    "Labor and material pricing",
+    "AI-assisted and human-reviewed",
+    "Contractor-ready Excel and PDF deliverables",
+    "Month-to-month — cancel anytime",
+]
+
 MONTHLY_PLANS = [
     {
         "id": "starter",
-        "name": "Starter Estimating Support",
+        "name": "Starter",
         "price": "$995",
+        "first_month": "$497.50",
         "period": "per month",
-        "best_for": "Smaller contractors that need regular estimating help but do not have constant bid volume.",
-        "features": [
-            "Up to 3 standard bids per month", "One active estimate at a time",
-            "Single-trade takeoffs and estimates", "Labor and material breakdowns", "Marked-up plans",
-            "One revision round per estimate", "Standard scheduling", "Saved client pricing preferences",
-            "Saved markup preferences", "Month-to-month service",
-        ],
-        "cta": "Add Estimating Support",
-        "href": "capacity-plan.html?plan=starter",
+        "best_for": "Add estimating capacity without hiring another full-time estimator.",
+        "features": _MONTHLY_FEATURES,
+        "cta": "Choose This Plan",
+        "href": "https://portal.mobiestimates.com/start?plan=starter",
         "featured": False,
     },
     {
         "id": "growth",
-        "name": "Growth Bid Support",
+        "name": "Growth",
         "price": "$1,995",
+        "first_month": "$997.50",
         "period": "per month",
-        "best_for": "Contractors that want to bid more consistently without hiring another estimator.",
-        "features": [
-            "Up to 7 standard bids per month", "Up to two active estimates at a time",
-            "Single-trade estimates", "Smaller multi-trade estimates", "Quantity takeoffs",
-            "Labor pricing", "Material pricing", "Equipment pricing when applicable", "Bid preparation",
-            "Scope review", "Addenda support", "Revision support", "Priority scheduling",
-            "Custom estimate templates", "Monthly bid-pipeline review", "Month-to-month service",
-        ],
-        "cta": "Increase My Bid Capacity",
-        "href": "capacity-plan.html?plan=growth",
+        "best_for": "More monthly estimating capacity so you can submit more bids.",
+        "features": _MONTHLY_FEATURES,
+        "cta": "Choose This Plan",
+        "href": "https://portal.mobiestimates.com/start?plan=growth",
         "featured": True,
         "badge": "Most Popular",
     },
     {
-        "id": "department",
-        "name": "Outsourced Estimating Department",
+        "id": "estimating_department",
+        "name": "Estimating Department",
         "price": "$2,995",
+        "first_month": "$1,497.50",
         "period": "per month",
-        "best_for": ("Growing contractors that want Mobi to operate as their primary estimating resource "
-                     "or significantly expand their internal estimating capacity."),
-        "features": [
-            "Up to 12 standard bids per month", "Up to three active estimates at a time",
-            "Single-trade estimates", "Multi-trade estimates", "General contractor estimate support",
-            "Quantity takeoffs", "Labor, material, and equipment pricing", "Bid preparation", "Bid leveling",
-            "Scope-gap review", "Addenda management", "Alternates and allowances", "Bid-form support",
-            "Custom pricing preferences", "Custom markup preferences", "Custom estimate templates",
-            "Priority scheduling", "Weekly bid-pipeline meeting", "Dedicated communication channel",
-            "Month-to-month service",
-        ],
-        "cta": "Build My Estimating Department",
-        "href": "capacity-plan.html?plan=department",
+        "best_for": "Your outsourced estimating department for steady monthly bid volume.",
+        "features": _MONTHLY_FEATURES,
+        "cta": "Choose This Plan",
+        "href": "https://portal.mobiestimates.com/start?plan=estimating_department",
         "featured": False,
     },
 ]
 
-STANDARD_BID_DEF = (
-    "A standard bid is based on typical project size, scope, drawing completeness, number of trades, "
-    "complexity, and required turnaround. Larger, multi-trade, incomplete, highly detailed, or accelerated "
-    "projects may count as two or more standard bids. Every project is reviewed before being assigned to "
-    "monthly capacity.")
+# 50%-off-first-month promotion copy (monthly plans only).
+FIRST_MONTH_PROMO = "Get 50% off your first month on any monthly plan"
+FIRST_MONTH_PROMO_NOTE = ("Regular monthly pricing begins with your second month. "
+                          "Pay Per Project is not included in this promotion.")
 
 MONTHLY_CAPACITY_NOTE = (
-    "Monthly subscriptions reserve estimating capacity and workflow support. They are not unlimited-use "
-    "plans. Project classifications and expected monthly capacity are confirmed during onboarding.")
+    "Monthly subscriptions reserve ongoing estimating support and are billed month-to-month. "
+    "They are not unlimited-use plans.")
+
+STANDARD_BID_DEF = (
+    "Every project is reviewed before work begins. Larger, multi-trade, or unusually complex "
+    "projects may require a confirmed scope, price, and delivery timeline.")
 
 # Owner-configurable policy answers (kept out of public copy until confirmed).
 # Set ROLLOVER_POLICY to a real answer to publish it in the FAQ.
@@ -219,19 +196,18 @@ FOUNDER_STATEMENT = (
 # --------------------------------------------------------------------------
 # Primary / secondary CTAs (label -> destination)
 # --------------------------------------------------------------------------
-CTA_PRIMARY = ("Upload Plans for a Free Quote", "upload-plans.html")
-CTA_UPLOAD = ("Upload Plans", "upload-plans.html")
+# Every general/primary CTA sends visitors to the pricing page to choose a plan
+# first (no "free trial", no "free quote", no "upload plans" as the primary path).
+CTA_PRIMARY = ("Join Now", "pricing.html")
+CTA_UPLOAD = ("View Plans & Pricing", "pricing.html")
 CTA_PRICING = ("View Pricing", "pricing.html")
 CTA_SAMPLE = ("Download Sample Estimate", "sample-estimate.html")
-CTA_CAPACITY = ("Request My Capacity Plan", "capacity-plan.html")
-CTA_PILOT = ("Start My 30-Day Pilot", "capacity-plan.html?plan=pilot")
-CTA_COMPARE = ("Compare Estimating Options", "pricing.html")
+CTA_CAPACITY = ("View Plans & Pricing", "pricing.html")
+CTA_COMPARE = ("Compare Plans", "pricing.html")
 
-# Account signup / subscription onboarding (the separate client portal app).
-# Homepage hero + mobile sticky bar point here to drive sign-ups.
-# TODO: confirm the live portal domain and update if the portal is hosted
-# elsewhere (e.g. the Vercel deployment URL) before launch.
-JOIN_URL = "https://portal.mobiestimates.com/signup"
-CTA_JOIN = ("Join Now", JOIN_URL)
+# Primary "Join Now" CTA → the pricing page (NOT signup/checkout directly).
+# Visitors review plans, pick one, then the plan card hands off to the portal
+# checkout (https://portal.mobiestimates.com/start?plan=<id>).
+CTA_JOIN = ("Join Now", "pricing.html")
 
-ASSET_VER = "11"  # bump to bust browser cache when CSS/JS change
+ASSET_VER = "12"  # bump to bust browser cache when CSS/JS/pricing change

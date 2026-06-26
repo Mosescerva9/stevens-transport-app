@@ -423,9 +423,9 @@ def home_process_steps():
 
 def home_pricing_preview():
     cards = [
-        ("Project-Based Estimating", "Starting at $199", "For occasional takeoffs and estimates.", "pricing.html#project"),
-        ("Monthly Estimating Support", "Starting at $995/mo", "For contractors that want dependable monthly bid capacity.", "pricing.html#monthly"),
-        ("Outsourced Estimating Department", "$2,995/mo", "For growing companies that want Mobi as their primary estimating partner.", "pricing.html#monthly"),
+        ("Monthly estimating plans", "From $995/mo", "Three plans — 50% off your first month.", "pricing.html#monthly"),
+        ("Growth (Most Popular)", "$1,995/mo", "Our most popular monthly plan for bidding more consistently.", "pricing.html#monthly"),
+        ("Pay Per Project", "$599 one-time", "One professional estimate — not a subscription.", "pricing.html#one-time"),
     ]
     cells = "".join(
         '<a class="card card-hover reveal price-preview" data-delay="%d" href="%s"><div class="pp-name">%s</div><div class="pp-price">%s</div><p>%s</p><span class="tag" style="margin-top:14px">See details %s</span></a>'
@@ -471,55 +471,40 @@ def project_vs_monthly():
 # PRICING
 # ==========================================================================
 def build_pricing():
-    proj_cards = "".join(project_card(p, i * 70) for i, p in enumerate(PROJECT_PLANS))
     mon_cards = "".join(monthly_card(p, i * 70) for i, p in enumerate(MONTHLY_PLANS))
+    ppp_card = project_card(PROJECT_PLANS[0])
 
-    pilot = '''<section class="section">
-  <div class="container">
-    <div class="cta-band reveal">
-      <div class="blueprint"></div>
-      <div style="position:relative;max-width:680px">
-        <span class="eyebrow on-dark">30-day pilot</span>
-        <h2 style="margin-top:14px">Try Mobi as your overflow estimating department</h2>
-        <p class="lead" style="color:#cdddf7;margin-top:14px">Start with a 30-day pilot without a long-term commitment. We will learn your preferred templates, pricing structure, markup requirements, communication process, and estimating workflow, then provide the bid capacity included with your selected plan.</p>
-        <div class="flex gap-3 wrap" style="margin-top:26px">%s %s</div>
-      </div>
-    </div>
-  </div>
-</section>''' % (btn(CTA_PILOT[0], CTA_PILOT[1], "primary", "rocket", data="pilot_cta"),
-                 btn("Compare Estimating Options", "#monthly", "ghost"))
+    promo = '''<div class="promo-banner reveal">
+  <p class="promo-head">%s</p>
+  <p class="promo-note">%s</p>
+</div>''' % (FIRST_MONTH_PROMO, FIRST_MONTH_PROMO_NOTE)
 
     body = page_hero(
         "Pricing",
-        "Estimating support that scales with your bid volume",
-        "Choose the level of estimating support that fits your bid volume. Use Mobi for one project, consistent monthly support, or as your primary outsourced estimating resource.",
+        "Choose the estimating support that fits your business",
+        "Get fast, professional, human-reviewed construction estimates without immediately adding another full-time estimator to your payroll. Choose a monthly plan or order one estimate for a one-time price.",
         [("Pricing", None)]
     ) + '''
-<section class="section" id="project">
+<section class="section" id="monthly">
   <div class="container">
-    <div class="center reveal" style="max-width:680px;margin-inline:auto">
-      <span class="eyebrow">Project-based estimating</span>
-      <h2 class="mt-2">Pay per project</h2>
-      <p class="muted mt-3">Every project is different. Project-based prices are starting points. Upload your plans to receive an exact fixed quote before work begins.</p>
+    %s
+    <div class="center reveal mt-8" style="max-width:720px;margin-inline:auto">
+      <span class="eyebrow">Monthly estimating subscriptions</span>
+      <h2 class="mt-2">Three monthly plans — 50%% off your first month</h2>
     </div>
     <div class="grid cols-3 mt-8 pkg-grid">%s</div>
     <p class="muted center mt-6" style="max-width:80ch;margin-inline:auto;font-size:.9rem">%s</p>
   </div>
 </section>
 
-<section class="section band-alt" id="monthly">
+<section class="section band-alt" id="one-time">
   <div class="container">
-    <div class="center reveal" style="max-width:720px;margin-inline:auto">
-      <span class="eyebrow">Monthly estimating subscriptions</span>
-      <h2 class="mt-2">Your outsourced estimating department for growing contractors</h2>
-      <p class="lead mt-3">Mobi can serve as your primary estimating resource or extend the capacity of your internal team. Get dependable estimating support without recruiting, training, and managing another employee.</p>
+    <div class="center reveal" style="max-width:680px;margin-inline:auto">
+      <span class="eyebrow">One-time option</span>
+      <h2 class="mt-2">Pay Per Project</h2>
+      <p class="muted mt-3">Need one estimate? Get it for $599. Bid consistently? Join a monthly plan and lower your cost per estimate. The first-month discount does not apply to Pay Per Project.</p>
     </div>
-    <div class="grid cols-3 mt-8 pkg-grid">%s</div>
-    <div class="standard-bid reveal mt-8">
-      <h3>%s What counts as a standard bid?</h3>
-      <p>%s</p>
-      <p style="margin-top:12px">%s</p>
-    </div>
+    <div class="grid mt-8 pkg-grid" style="max-width:520px;margin-inline:auto">%s</div>
   </div>
 </section>
 
@@ -534,8 +519,6 @@ def build_pricing():
   </div>
 </section>
 
-%s
-
 <section class="section band-alt">
   <div class="container">
     <div class="center reveal" style="max-width:680px;margin-inline:auto">
@@ -547,18 +530,17 @@ def build_pricing():
 </section>
 
 %s
-''' % (proj_cards, PROJECT_PRICING_DISCLAIMER, mon_cards, icon("clipboard-check"),
-       STANDARD_BID_DEF, MONTHLY_CAPACITY_NOTE,
+''' % (promo, mon_cards, MONTHLY_CAPACITY_NOTE, ppp_card,
        check_list(["Recruiting", "Onboarding", "Training", "Software", "Payroll", "Benefits",
                    "Management", "Employee downtime", "Fluctuating bid volume"], "cols-3"),
-       pilot, comparison_table(),
-       cta_band("Get an exact quote before any work begins",
-                "Upload your plans for a free scope review — we confirm price, deliverables and turnaround first.",
-                (CTA_PRIMARY[0], CTA_PRIMARY[1], "upload"),
-                (CTA_CAPACITY[0], CTA_CAPACITY[1])))
+       comparison_table(),
+       cta_band("Choose the plan that fits your business",
+                "Pick a monthly plan for ongoing estimating support, or order one estimate for a one-time $599 price.",
+                ("Choose a Monthly Plan", "#monthly"),
+                ("Order One Estimate", "https://portal.mobiestimates.com/start?plan=pay_per_project")))
     page("pricing.html",
-         "Pricing | Construction Estimating Plans & Monthly Support | Mobi Estimates",
-         "Transparent construction estimating pricing. Project-based takeoffs from $199 and monthly estimating subscriptions from $995. Upload plans for an exact fixed quote before work begins.",
+         "Pricing | Monthly Estimating Plans & Pay Per Project | Mobi Estimates",
+         "Mobi Estimates pricing: three monthly plans — Starter $995, Growth $1,995, Estimating Department $2,995 — with 50% off your first month, or a one-time $599 Pay Per Project estimate. No free trial.",
          body, active="pricing")
 
 
@@ -706,9 +688,9 @@ def build_capacity_plan():
     </div>
   </div>
 </section>''' % (
-        check_list(["Reserved monthly bid capacity", "Priority scheduling", "Your templates, pricing & markups",
-                    "Bid-pipeline review", "Month-to-month — cancel anytime"]),
-        btn("Or start a 30-day pilot", "capacity-plan.html?plan=pilot", "outline", "rocket", cls="btn-block", data="capacity_pilot"),
+        check_list(["Ongoing monthly estimating support", "Your templates, pricing & markups",
+                    "AI-assisted and human-reviewed", "Month-to-month — cancel anytime"]),
+        btn("View plans & pricing", "pricing.html", "outline", "arrow-right", cls="btn-block", data="capacity_pricing"),
         form)
     page("capacity-plan.html",
          "Request a Monthly Estimating Capacity Plan | Mobi Estimates",
@@ -1224,34 +1206,32 @@ def build_about():
 # ==========================================================================
 def build_faq():
     faqs = [
+        ("Do you offer a free trial?",
+         "No. Mobi Estimates does not offer a free trial. New monthly subscribers receive 50% off their first month, and regular monthly pricing begins with the second month."),
         ("How much does an estimate cost?",
-         "Project-based estimating starts at $199 for a single-trade takeoff and $399 for a full estimate; GC and multi-trade projects are custom quoted. Final pricing depends on size, scope, drawing quality, trade count, complexity, deliverables, and turnaround. Upload your plans for an exact fixed quote before work begins."),
-        ("What is included in project-based estimating?",
-         "Depending on the service: quantity takeoffs, labor/material/equipment pricing, trade-by-trade breakdowns, assumptions and exclusions, marked-up drawings, a proposal-ready summary, and one revision round. Delivered in Excel and PDF."),
-        ("What is included in monthly estimating support?",
-         "Monthly plans reserve estimating capacity and workflow support — takeoffs, cost estimates, bid preparation, scope review, revisions, your saved templates and markups, and bid-pipeline review. Plans are based on standard bids per month, not estimator hours."),
-        ("What counts as a standard bid?",
-         STANDARD_BID_DEF),
-        ("Can a large project count as more than one bid?",
-         "Yes. Larger, multi-trade, incomplete, highly detailed, or accelerated projects may count as two or more standard bids. Every project is reviewed before being assigned to monthly capacity."),
+         "Monthly plans are Starter $995/month, Growth $1,995/month, and Estimating Department $2,995/month — and new monthly subscribers get 50% off the first month (then the regular monthly price from the second month). Prefer a one-time option? Pay Per Project is $599 for one estimate."),
+        ("Is the 50% discount recurring?",
+         "No. The 50% discount applies only to the first month of a new monthly subscription. Regular pricing begins with the second month."),
+        ("Can I purchase only one estimate?",
+         "Yes. The Pay Per Project option is a one-time payment of $599 for one estimate. It does not create a monthly subscription."),
+        ("Where does the Join Now button take me?",
+         "The Join Now button takes you to the pricing page, where you can compare the available options and choose the plan that fits your business."),
+        ("What is included in an estimate?",
+         "Construction takeoffs with labor and material pricing, prepared with AI assistance and reviewed by people, delivered as contractor-ready Excel and PDF files."),
+        ("What is the difference between monthly plans and Pay Per Project?",
+         "Monthly plans provide ongoing estimating support billed month-to-month (cancel anytime). Pay Per Project is a single $599 one-time estimate with no subscription, and the first-month discount does not apply."),
         ("How quickly can you complete an estimate?",
-         "Single-trade takeoffs are typically 2–4 business days and full estimates typically 3–5 business days. " + TURNAROUND_NOTE),
+         "Most standard-scope estimates are delivered within 48 hours after all required plans, documents, and project information are received. Larger or unusually complex projects may require a confirmed delivery timeline. " + TURNAROUND_NOTE),
         ("Do you work with all construction trades?",
          "Yes. Mobi supports all major CSI divisions and construction trades — sitework, concrete, masonry, metals, carpentry, thermal and moisture, openings, finishes, MEP, and more."),
         ("What types of projects do you estimate?",
          "Residential, commercial, multifamily, industrial, civil, institutional, renovation, tenant-improvement, and ground-up new construction."),
         ("Can Mobi replace our internal estimator?",
          "Mobi can serve as your primary estimating resource or extend the capacity of your internal team. The right fit depends on your bid volume and goals — we'll help you decide."),
-        ("Can Mobi work with our existing estimate templates?",
-         "Yes. On monthly plans we save and use your estimate templates, formatting, and deliverable preferences."),
         ("Can Mobi use our labor rates and markups?",
          "Yes. We can use your client-provided labor rates, material prices, supplier quotes, production rates, overhead, and markup preferences."),
         ("What files should we upload?",
          "Plans, specifications, addenda, bid forms, scope notes, site information, and any supplier or subcontractor pricing. Accepted file types: " + ACCEPTED_FILE_TYPES + "."),
-        ("Are revisions included?",
-         "Project-based estimates include one revision round. Monthly plans include revision support per your selected plan."),
-        ("Can you handle rush projects?",
-         "Rush service may be available for qualifying projects. Turnaround is confirmed before work begins; we won't promise a deadline before reviewing the scope."),
         ("Can monthly service be canceled?",
          CANCELLATION_POLICY),
         ("How are project documents protected?",
@@ -1260,13 +1240,7 @@ def build_faq():
          "No estimating company can guarantee that a contractor will win a project. Bid results depend on competition, qualifications, schedule, relationships, pricing strategy, project requirements, and other factors. Mobi provides organized, carefully reviewed estimates designed to help contractors submit bids efficiently and confidently."),
         ("Do you guarantee estimate accuracy?",
          "Every estimate is reviewed for scope coverage, quantities, calculations, drawing revisions, assumptions, exclusions, and formatting. Estimates are based on the plans, specifications, project information, and pricing inputs available at the time."),
-        ("What happens after we upload our plans?",
-         "We review the project (free scope review), confirm the recommended service, exact price, deliverables, and turnaround, and only begin once you approve."),
     ]
-    # Conditionally publish the rollover policy only if the owner has set it
-    if ROLLOVER_POLICY:
-        faqs.insert(14, ("Do unused monthly bids roll over?", ROLLOVER_POLICY))
-    # else: intentionally omitted until policy confirmed (see config.ROLLOVER_POLICY)
 
     items_html = "".join(
         '<div class="faq-item reveal"><button class="faq-q" type="button" aria-expanded="false">%s<span class="chev">%s</span></button><div class="faq-a"><div class="inner">%s</div></div></div>'
@@ -1279,8 +1253,8 @@ def build_faq():
     ) + ('<section class="section"><div class="container" style="max-width:820px">%s</div></section>%s'
          % (items_html,
             cta_band("Still have questions?",
-                     "Upload your plans for a free scope review, or request a capacity plan and we'll help you choose.",
-                     (CTA_PRIMARY[0], CTA_PRIMARY[1], "upload"), (CTA_CAPACITY[0], CTA_CAPACITY[1]))))
+                     "Compare the monthly plans and the one-time Pay Per Project option on the pricing page, then choose what fits.",
+                     (CTA_PRIMARY[0], CTA_PRIMARY[1], "arrow-right"), (CTA_PRICING[0], CTA_PRICING[1]))))
     page("faq.html", "FAQ | Construction Estimating Questions | Mobi Estimates",
          "Answers about Mobi Estimates pricing, turnaround, standard bids, monthly capacity, file handling, revisions, and guarantees.",
          body, active="faq", schema_extra=faq_schema(faqs))
